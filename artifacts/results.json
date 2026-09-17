@@ -1,0 +1,72 @@
+{
+  "model_name": "Regressão Logística",
+  "best_params": {
+    "clf__C": 0.1,
+    "clf__penalty": "l1"
+  },
+  "threshold": 0.4643269712051157,
+  "cv_roc_auc": 0.8143901324805847,
+  "cv_erro_padrao": 0.005011050798723808,
+  "metrics": {
+    "train": {
+      "threshold": 0.4643269712051157,
+      "accuracy": 0.7475,
+      "balanced_accuracy": 0.770422359732547,
+      "precision": 0.6189349112426036,
+      "recall": 0.8644628099173554,
+      "f1": 0.7213793103448276,
+      "roc_auc": 0.8262710245442086,
+      "pr_auc": 0.6969521584322133,
+      "mcc": 0.5253636145089389,
+      "brier": 0.17071772487728357
+    },
+    "cv_oof": {
+      "threshold": 0.4643269712051157,
+      "accuracy": 0.7475,
+      "balanced_accuracy": 0.770422359732547,
+      "precision": 0.6189349112426036,
+      "recall": 0.8644628099173554,
+      "f1": 0.7213793103448276,
+      "roc_auc": 0.8126259396154325,
+      "pr_auc": 0.6582127981058167,
+      "mcc": 0.5253636145089389,
+      "brier": 0.17380512725261743
+    },
+    "test": {
+      "threshold": 0.4643269712051157,
+      "accuracy": 0.7075,
+      "balanced_accuracy": 0.7324795872230645,
+      "precision": 0.5779816513761468,
+      "recall": 0.8344370860927153,
+      "f1": 0.6829268292682927,
+      "roc_auc": 0.7782520811723715,
+      "pr_auc": 0.6307741586012676,
+      "mcc": 0.4526255107713093,
+      "brier": 0.19508361860734066
+    },
+    "temporal_test": {
+      "threshold": 0.4643269712051157,
+      "accuracy": 0.7389885807504079,
+      "balanced_accuracy": 0.7602658623771223,
+      "precision": 0.6204819277108434,
+      "recall": 0.8583333333333333,
+      "f1": 0.7202797202797203,
+      "roc_auc": 0.8091041108132261,
+      "pr_auc": 0.6839694115790906,
+      "mcc": 0.5099000311246971,
+      "brier": 0.1775613690880866
+    }
+  },
+  "n_train": 1600,
+  "n_test": 400,
+  "n_features_raw": 38,
+  "dropped_columns": [
+    "Survival_Months",
+    "Treatment",
+    "Patient_ID",
+    "Diagnosis_Date",
+    "Age_Group",
+    "BMI_Category",
+    "Country"
+  ]
+}

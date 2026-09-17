@@ -1,0 +1,47 @@
+VALIDACAO DO DATASET BRUTO
+  [OK]    R1 schema: 46 colunas esperadas presentes
+  [OK]    R1 schema: colunas numéricas com dtype numérico
+  [OK]    R2 alvo: sem valores ausentes
+  [OK]    R2 alvo: níveis == {'Yes', 'No'}
+  [OK]    R2 alvo: classe minoritária = 37.8% (> 5%)
+  [OK]    R3 ausentes: 0 valores nulos no dataset
+  [OK]    R4 duplicidade: Patient_ID único
+  [OK]    R4 duplicidade: 0 linhas idênticas (sem ID)
+  [OK]    R5 domínio: Age dentro de [18, 110] (0 fora)
+  [OK]    R5 domínio: BMI dentro de [10.0, 70.0] (0 fora)
+  [OK]    R5 domínio: Tumor_Size_cm dentro de [0.1, 30.0] (0 fora)
+  [OK]    R5 domínio: Cigarettes_Per_Day dentro de [0, 100] (0 fora)
+  [OK]    R5 domínio: Years_Smoking dentro de [0, 80] (0 fora)
+  [OK]    R5 domínio: Pack_Years dentro de [0.0, 300.0] (0 fora)
+  [OK]    R5 domínio: Risk_Factor_Count dentro de [0, 8] (0 fora)
+  [OK]    R5 domínio: Symptom_Count dentro de [0, 10] (0 fora)
+  [OK]    R5 domínio: Diagnosis_Year dentro de [1990, 2030] (0 fora)
+  [OK]    R6 categorias: Gender ⊆ ['Female', 'Male']
+  [OK]    R6 categorias: Smoking_Status ⊆ ['Current Smoker', 'Former Smoker', 'Never Smoked']
+  [OK]    R6 categorias: Cancer_Type ⊆ ['NSCLC', 'SCLC']
+  [OK]    R6 categorias: Cancer_Stage ⊆ ['Stage I', 'Stage II', 'Stage III', 'Stage IV']
+  [OK]    R6 categorias: Metastasis ⊆ ['No', 'Yes']
+  [OK]    R6 categorias: Secondhand_Smoke binária Yes/No
+  [OK]    R6 categorias: Family_History binária Yes/No
+  [OK]    R6 categorias: Occupational_Hazard binária Yes/No
+  [OK]    R6 categorias: Chronic_Lung_Disease binária Yes/No
+  [OK]    R6 categorias: Asbestos_Exposure binária Yes/No
+  [OK]    R6 categorias: Radon_Exposure binária Yes/No
+  [OK]    R6 categorias: Previous_Cancer_History binária Yes/No
+  [OK]    R6 categorias: Coughing binária Yes/No
+  [OK]    R6 categorias: Shortness_of_Breath binária Yes/No
+  [OK]    R6 categorias: Chest_Pain binária Yes/No
+  [OK]    R6 categorias: Coughing_Blood binária Yes/No
+  [OK]    R6 categorias: Fatigue binária Yes/No
+  [OK]    R6 categorias: Weight_Loss binária Yes/No
+  [OK]    R6 categorias: Wheezing binária Yes/No
+  [OK]    R6 categorias: Recurrent_Infections binária Yes/No
+  [OK]    R6 categorias: Swallowing_Difficulty binária Yes/No
+  [OK]    R6 categorias: Finger_Clubbing binária Yes/No
+  [OK]    R6 categorias: Metastasis binária Yes/No
+  [OK]    R7 coerência: 'Never Smoked' => carga tabágica zero
+  [OK]    R7 coerência: SCLC => NSCLC_Subtype == 'Not Applicable'
+  [OK]    R7 coerência: Stage IV => Metastasis == 'Yes'
+  [OK]    R9 derivação: Pack_Years == Cigarettes_Per_Day/20 * Years_Smoking
+  [OK]    R9 derivação: Symptom_Count == soma dos 10 sintomas
+  [OK]    R9 derivação: Risk_Factor_Count == 7 fatores + poluição alta

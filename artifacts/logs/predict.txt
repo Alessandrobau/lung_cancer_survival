@@ -1,0 +1,70 @@
+Modelo carregado: Regressão Logística
+Hiperparâmetros : {'clf__C': 0.1, 'clf__penalty': 'l1'}
+Limiar          : 0.464
+scikit-learn    : 1.8.0
+
+==========================================================================================
+1. PREDICOES EM PACIENTES REAIS DO CONJUNTO DE TESTE
+==========================================================================================
+Patient_ID  Age Gender Cancer_Stage Metastasis  Tumor_Size_cm  prob_sobrevida      predicao confianca           real acerto
+   LC-1852   81   Male     Stage IV        Yes            6.1          0.1218 Não sobrevive      alta Não sobreviveu     OK
+   LC-1227   69   Male     Stage IV        Yes            7.4          0.1050 Não sobrevive      alta Não sobreviveu     OK
+   LC-1599   70 Female      Stage I         No            1.0          0.8401     Sobrevive      alta     Sobreviveu     OK
+   LC-0420   56 Female      Stage I         No            2.0          0.8499     Sobrevive      alta     Sobreviveu     OK
+   LC-0575   63   Male      Stage I         No            0.5          0.8399     Sobrevive      alta     Sobreviveu     OK
+   LC-1520   59 Female     Stage IV        Yes            7.7          0.0884 Não sobrevive      alta Não sobreviveu     OK
+   LC-0196   89   Male    Stage III         No            6.7          0.2765 Não sobrevive     média     Sobreviveu   ERRO
+   LC-1623   71 Female      Stage I         No            1.3          0.8615     Sobrevive      alta Não sobreviveu   ERRO
+   LC-1879   61 Female     Stage II         No            3.1          0.6169     Sobrevive     média Não sobreviveu   ERRO
+   LC-1627   67   Male      Stage I         No            2.5          0.8106     Sobrevive      alta Não sobreviveu   ERRO
+   LC-0808   56   Male      Stage I         No            2.3          0.8279     Sobrevive      alta Não sobreviveu   ERRO
+   LC-1672   57   Male      Stage I         No            0.8          0.8340     Sobrevive      alta Não sobreviveu   ERRO
+
+Acurácia no conjunto de teste completo (400 pacientes): 70.8%
+Distribuição da confiança das predições:
+confianca
+alta     226
+média    143
+baixa     31
+
+==========================================================================================
+2. CASOS CLINICOS SINTETICOS
+==========================================================================================
+
+  Caso A — rastreio precoce, não fumante
+    estádio Stage I    tumor 1.8 cm   sintomas 1
+    probabilidade de sobrevida: 0.814  |################################        |
+    predição: Sobrevive  (confiança alta)
+
+  Caso B — doença avançada, tabagista pesado
+    estádio Stage IV   tumor 8.5 cm   sintomas 8
+    probabilidade de sobrevida: 0.100  |###                                     |
+    predição: Não sobrevive  (confiança alta)
+
+  Caso C — intermediário, quadro ambíguo
+    estádio Stage II   tumor 4.2 cm   sintomas 4
+    probabilidade de sobrevida: 0.566  |######################                  |
+    predição: Sobrevive  (confiança média)
+
+==========================================================================================
+3. ANALISE WHAT-IF — VARIANDO UMA UNICA VARIAVEL
+==========================================================================================
+
+  Efeito do estadiamento (demais variáveis fixas no Caso C):
+    Stage I    prob = 0.817  |################################        |  -> Sobrevive
+    Stage II   prob = 0.566  |######################                  |  -> Sobrevive
+    Stage III  prob = 0.276  |###########                             |  -> Não sobrevive
+    Stage IV   prob = 0.100  |###                                     |  -> Não sobrevive
+
+  Efeito da idade (Caso C, estádio II):
+    40 anos    prob = 0.533
+    50 anos    prob = 0.549
+    60 anos    prob = 0.565
+    70 anos    prob = 0.580
+    80 anos    prob = 0.595
+
+  Efeito da hemoptise (Coughing_Blood), Caso C:
+    Coughing_Blood = No   prob = 0.566
+    Coughing_Blood = Yes  prob = 0.532
+
+  Predições do teste exportadas -> artifacts/predicoes_teste.csv

@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Relatório Técnico — Prognóstico de Sobrevida em Câncer de Pulmão</title>
+<style>
+@page { size: A4; margin: 18mm 16mm 16mm 16mm; }
+body { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 10pt; line-height: 1.45;
+       color: #1a1a1a; }
+h1 { font-size: 17pt; margin: 0 0 4px 0; color: #12395e; }
+h2 { font-size: 13pt; color: #12395e; border-bottom: 2px solid #12395e;
+     padding-bottom: 3px; margin-top: 22px; margin-bottom: 10px; page-break-after: avoid; }
+h3 { font-size: 11pt; color: #1f5f8b; margin-top: 15px; margin-bottom: 6px;
+     page-break-after: avoid; }
+p { margin: 6px 0; text-align: justify; }
+table { border-collapse: collapse; width: 100%; margin: 9px 0; font-size: 8.6pt;
+        page-break-inside: avoid; }
+th { background: #12395e; color: #fff; padding: 5px 6px; text-align: left;
+     font-weight: 600; }
+td { padding: 4px 6px; border-bottom: 1px solid #d8dde2; vertical-align: top; }
+tr:nth-child(even) td { background: #f5f7f9; }
+code, .mono { font-family: "DejaVu Sans Mono", monospace; font-size: 8.4pt;
+              background: #eef1f4; padding: 1px 3px; border-radius: 2px; }
+pre { background: #1e2733; color: #e6edf3; padding: 8px 10px; border-radius: 3px;
+      font-family: "DejaVu Sans Mono", monospace; font-size: 7.1pt; line-height: 1.3;
+      overflow: hidden; white-space: pre; page-break-inside: avoid; }
+figure { margin: 10px 0; text-align: center; page-break-inside: avoid; }
+figure img { max-width: 100%; border: 1px solid #ccd3da; }
+figcaption { font-size: 8pt; color: #555; margin-top: 4px; text-align: left;
+             font-style: italic; }
+.head { border-bottom: 3px solid #12395e; padding-bottom: 8px; margin-bottom: 14px; }
+.sub { color: #555; font-size: 9pt; margin: 2px 0; }
+.box { background: #eef4f9; border-left: 4px solid #1f5f8b; padding: 8px 11px;
+       margin: 10px 0; page-break-inside: avoid; }
+.warn { background: #fdf2ec; border-left: 4px solid #c0392b; padding: 8px 11px;
+        margin: 10px 0; page-break-inside: avoid; }
+.ok { background: #eef8ef; border-left: 4px solid #2e7d32; padding: 8px 11px;
+      margin: 10px 0; page-break-inside: avoid; }
+.pb { page-break-before: always; }
+ul, ol { margin: 6px 0 6px 0; padding-left: 20px; }
+li { margin: 3px 0; text-align: justify; }
+.small { font-size: 8.5pt; color: #555; }
+.center { text-align: center; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.hl { background: #fff3cd; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="head">
+<h1>Prognóstico de sobrevida em câncer de pulmão</h1>
+<p class="sub"><strong>Trabalho 1 — Inteligência Artificial II — 2026/02</strong></p>
+<p class="sub">Faculdade Antonio Meneghetti (AMF) — Sistemas de Informação</p>
+<p class="sub">Tarefa de machine learning: classificação binária supervisionada</p>
+</div>
+
+<div class="box">
+<strong>Resumo.</strong> Modelo de classificação que estima, no momento do diagnóstico,
+se um paciente com câncer de pulmão sobreviverá. O modelo final é uma Regressão
+Logística com regularização L1 (C&nbsp;=&nbsp;0,1), com <strong>ROC-AUC de 0,778</strong>
+no conjunto de teste e 0,809 sob divisão temporal. O projeto dá peso central ao
+tratamento de vazamento de dados: três colunas pós-desfecho foram removidas antes
+de qualquer divisão, todo o pré-processamento vive dentro do
+<code>Pipeline</code> e o limiar de decisão é calibrado apenas no treino. A
+análise de ablação revela o achado mais relevante: <strong>o estadiamento sozinho
+já alcança ROC-AUC 0,813, e as outras 37 variáveis agregam +0,0014</strong> — menos
+de um terço do erro padrão da estimativa. O modelo é, na prática, um preditor de
+estádio, e o relatório discute por que esse resultado é honesto e o que ele diz
+sobre o dataset.
+</div>
+
+<h2>1. Dataset</h2>
+
+<table>
+<tr><th style="width:24%">Item</th><th>Descrição</th></tr>
+<tr><td><strong>Arquivo</strong></td><td><code>lung_cancer_dataset.csv</code> — incluído no repositório em <code>data/raw/</code>, sem qualquer modificação</td></tr>
+<tr><td><strong>Dimensões</strong></td><td>2.000 registros × 46 colunas</td></tr>
+<tr><td><strong>Origem</strong></td><td>Dataset público de registros oncológicos de câncer de pulmão, validado previamente com o professor</td></tr>
+<tr><td><strong>Unidade de análise</strong></td><td>Um paciente diagnosticado com câncer de pulmão, identificado por <code>Patient_ID</code></td></tr>
+<tr><td><strong>Cobertura</strong></td><td>60 países agrupados em 6 regiões da OMS; diagnósticos entre 2015 e 2026</td></tr>
+<tr><td><strong>Variável alvo</strong></td><td><code>Survived</code> — binária (<code>Yes</code>/<code>No</code>)</td></tr>
+</table>
+
+<h3>1.1 Conteúdo das colunas</h3>
+
+<table>
+<tr><th style="width:26%">Grupo</th><th style="width:8%">N</th><th>Exemplos</th></tr>
+<tr><td>Identificação e contexto</td><td class="num">5</td><td><code>Patient_ID</code>, <code>Diagnosis_Year</code>, <code>Diagnosis_Date</code>, <code>WHO_Region</code>, <code>Country</code></td></tr>
+<tr><td>Demografia</td><td class="num">4</td><td><code>Age</code>, <code>Age_Group</code>, <code>Gender</code>, <code>BMI</code></td></tr>
+<tr><td>Tabagismo</td><td class="num">4</td><td><code>Smoking_Status</code>, <code>Cigarettes_Per_Day</code>, <code>Years_Smoking</code>, <code>Pack_Years</code></td></tr>
+<tr><td>Exposições e fatores de risco</td><td class="num">9</td><td><code>Asbestos_Exposure</code>, <code>Radon_Exposure</code>, <code>Air_Pollution_Exposure</code>, <code>Occupational_Hazard</code>, <code>Family_History</code></td></tr>
+<tr><td>Sintomas</td><td class="num">11</td><td><code>Coughing_Blood</code>, <code>Chest_Pain</code>, <code>Weight_Loss</code>, <code>Finger_Clubbing</code>, <code>Symptom_Count</code></td></tr>
+<tr><td>Caracterização do tumor</td><td class="num">6</td><td><code>Cancer_Type</code>, <code>NSCLC_Subtype</code>, <code>Cancer_Stage</code>, <code>Tumor_Size_cm</code>, <code>Metastasis</code>, <code>Genetic_Mutation</code></td></tr>
+<tr><td>Diagnóstico e conduta</td><td class="num">2</td><td><code>Diagnosis_Method</code>, <code>Treatment</code></td></tr>
+<tr><td>Desfecho</td><td class="num">2</td><td><code>Survival_Months</code>, <code>Survived</code></td></tr>
+</table>
+
+<h3>1.2 Justificativa de adequação ao problema</h3>
+<p>
+O dataset é adequado por quatro razões objetivas. Primeira: o alvo é binário,
+completo e razoavelmente equilibrado (62,2% / 37,8%), o que dispensa técnicas
+agressivas de reamostragem. Segunda: contém variáveis reconhecidamente
+prognósticas em oncologia torácica — estadiamento TNM, presença de metástase,
+tamanho do tumor, tipo histológico e carga tabágica —, o que permite confrontar
+o que o modelo aprende com o conhecimento clínico consolidado. Terceira: o volume
+de 2.000 registros é suficiente para uma divisão treino/teste honesta com
+validação cruzada, sem cair em estimativas instáveis. Quarta, e a mais relevante
+para este trabalho: o dataset contém variáveis registradas <em>depois</em> do
+desfecho, o que o torna um caso de estudo natural sobre vazamento de dados.
+</p>
+
+<h2>2. Problema e objetivo</h2>
+
+<h3>2.1 Situação analisada</h3>
+<p>
+No atendimento oncológico, a estratificação de risco no momento do diagnóstico
+orienta decisões concretas: intensidade do acompanhamento, prioridade na fila
+cirúrgica, elegibilidade para protocolos experimentais e o teor da conversa com
+paciente e família. Essa estratificação hoje depende sobretudo do estadiamento e
+da experiência do oncologista. A pergunta do projeto é se um modelo estatístico,
+alimentado por variáveis rotineiramente disponíveis no diagnóstico, consegue
+apoiar essa decisão de forma reprodutível.
+</p>
+
+<h3>2.2 Objetivo</h3>
+<p>
+Estimar a probabilidade de sobrevida de um paciente <strong>usando exclusivamente
+informação disponível no instante do diagnóstico</strong>, e quantificar de forma
+honesta o quanto essa estimativa realmente vale.
+</p>
+
+<div class="box">
+<strong>A restrição temporal é a decisão de projeto mais importante.</strong>
+Ela define o que pode entrar no modelo. Um modelo que use o tempo de sobrevida ou
+o tratamento recebido pode exibir métricas excelentes e ser inútil na prática,
+porque essas informações não existem no momento em que a predição precisa ser
+feita. Toda a Seção 3.4 decorre dessa restrição.
+</div>
+
+<h3>2.3 Tipo de tarefa</h3>
+<table>
+<tr><th style="width:30%">Dimensão</th><th>Escolha</th></tr>
+<tr><td>Tipo de aprendizado</td><td>Supervisionado</td></tr>
+<tr><td>Tarefa</td><td>Classificação binária</td></tr>
+<tr><td>Alvo</td><td><code>Survived</code>: 1 = <code>Yes</code> (sobreviveu), 0 = <code>No</code></td></tr>
+<tr><td>Classe positiva</td><td><code>Yes</code> — sobrevivência</td></tr>
+<tr><td>Saída do modelo</td><td>Probabilidade contínua em [0,1], convertida em classe por um limiar calibrado</td></tr>
+<tr><td>Métrica de seleção</td><td>ROC-AUC (independente de limiar e de prevalência)</td></tr>
+</table>
+
+<h2 class="pb">3. Exploração e preparação dos dados</h2>
+
+<h3>3.1 Qualidade dos dados</h3>
+<p>
+A qualidade do arquivo é atipicamente alta, o que por si só é um indício de
+origem sintética:
+</p>
+<table>
+<tr><th style="width:38%">Verificação</th><th style="width:20%">Resultado</th><th>Consequência</th></tr>
+<tr><td>Valores ausentes</td><td><strong>0</strong> em 92.000 células</td><td>Imputação mantida no pipeline por robustez, mas nunca acionada</td></tr>
+<tr><td>Linhas duplicadas (ignorando o ID)</td><td><strong>0</strong></td><td>Nenhuma deduplicação necessária</td></tr>
+<tr><td><code>Patient_ID</code> único</td><td>2.000 / 2.000</td><td>Um registro por paciente; sem risco de agrupamento</td></tr>
+<tr><td>Valores fora de faixa plausível</td><td><strong>0</strong></td><td>Nenhuma correção de domínio necessária</td></tr>
+<tr><td>Coerência clínica interna</td><td>100%</td><td>Ver regras R7 na Seção 9</td></tr>
+</table>
+
+<figure>
+<img src="figures/01_eda_alvo.png">
+<figcaption>Figura 1 — Distribuição do alvo, mapa de ausentes e taxa de sobrevida por ano.
+O desbalanceamento é leve (1,65:1). A taxa de sobrevida não apresenta tendência
+temporal consistente, o que já sugere que o ano de diagnóstico carrega pouco sinal.</figcaption>
+</figure>
+
+<h3>3.2 Distribuições e outliers</h3>
+<p>
+A idade concentra-se entre 50 e 79 anos (mediana 60), compatível com a
+epidemiologia da doença. O tamanho do tumor tem mediana de 4,3&nbsp;cm e máximo de
+13,3&nbsp;cm. Aplicando o critério IQR de 1,5×, apenas <code>Pack_Years</code>
+apresenta contagem expressiva de pontos extremos:
+</p>
+
+<table>
+<tr><th>Variável</th><th class="num">Outliers IQR</th><th class="num">%</th><th class="num">Mín</th><th class="num">Máx</th><th>Interpretação</th></tr>
+<tr><td><code>Age</code></td><td class="num">4</td><td class="num">0,20</td><td class="num">30</td><td class="num">89</td><td>plausível</td></tr>
+<tr><td><code>BMI</code></td><td class="num">6</td><td class="num">0,30</td><td class="num">16,0</td><td class="num">40,0</td><td>plausível</td></tr>
+<tr><td><code>Tumor_Size_cm</code></td><td class="num">8</td><td class="num">0,40</td><td class="num">0,5</td><td class="num">13,3</td><td>plausível</td></tr>
+<tr><td class="hl"><code>Pack_Years</code></td><td class="num hl">236</td><td class="num hl">11,80</td><td class="num">0,0</td><td class="num">106,0</td><td class="hl">artefato de distribuição, não erro</td></tr>
+<tr><td><code>Cigarettes_Per_Day</code></td><td class="num">59</td><td class="num">2,95</td><td class="num">0</td><td class="num">56</td><td>idem</td></tr>
+<tr><td><code>Years_Smoking</code></td><td class="num">32</td><td class="num">1,60</td><td class="num">0</td><td class="num">59</td><td>idem</td></tr>
+</table>
+
+<div class="ok">
+<strong>Por que nenhum outlier foi removido.</strong> Os 236 "outliers" de
+<code>Pack_Years</code> não são erros de medição. Como 65,6% dos pacientes nunca
+fumaram, o primeiro, o segundo e o terceiro quartis dessa variável são todos
+iguais a zero, o que zera o intervalo interquartil e faz o critério IQR classificar
+<em>qualquer</em> fumante como ponto extremo. A distribuição é inflada em zero, não
+contaminada. Remover esses registros eliminaria justamente os fumantes — o grupo de
+maior interesse clínico. Todos os 2.000 registros foram mantidos.
+</div>
+
+<figure>
+<img src="figures/03_eda_outliers.png">
+<figcaption>Figura 2 — Boxplots das variáveis numéricas. Note que as caixas de
+<code>Pack_Years</code>, <code>Cigarettes_Per_Day</code> e <code>Years_Smoking</code>
+estão colapsadas no zero: é a assinatura visual da inflação em zero descrita acima.</figcaption>
+</figure>
+
+<figure>
+<img src="figures/02_eda_numericas.png">
+<figcaption>Figura 3 — Distribuições numéricas separadas por classe. Apenas
+<code>Tumor_Size_cm</code> mostra separação visual clara entre sobreviventes e não
+sobreviventes. <code>Age</code>, <code>BMI</code> e <code>Risk_Factor_Count</code>
+praticamente se sobrepõem.</figcaption>
+</figure>
+
+<h3>3.3 Associação das variáveis com o alvo</h3>
+<p>
+Medindo a associação das variáveis categóricas com o alvo pelo V de Cramér, o
+resultado é fortemente concentrado:
+</p>
+
+<table>
+<tr><th>Variável</th><th class="num">V de Cramér</th><th>Leitura</th></tr>
+<tr><td class="hl"><code>Cancer_Stage</code></td><td class="num hl">0,538</td><td class="hl">associação forte; domina todas as demais</td></tr>
+<tr><td><code>Metastasis</code></td><td class="num">0,381</td><td>forte, mas quase redundante com o estádio</td></tr>
+<tr><td><code>Diagnosis_Method</code></td><td class="num">0,202</td><td>moderada; reflete detecção precoce</td></tr>
+<tr><td><code>Smoking_Status</code></td><td class="num">0,137</td><td>fraca</td></tr>
+<tr><td><code>Genetic_Mutation</code></td><td class="num">0,077</td><td>muito fraca</td></tr>
+<tr><td><code>Chronic_Lung_Disease</code></td><td class="num">0,068</td><td>muito fraca</td></tr>
+<tr><td><code>Coughing_Blood</code></td><td class="num">0,066</td><td>muito fraca</td></tr>
+<tr><td><code>Air_Pollution_Exposure</code></td><td class="num">0,062</td><td>muito fraca (e com sinal invertido — ver Seção 7.4)</td></tr>
+</table>
+
+<figure>
+<img src="figures/04_eda_categoricas.png">
+<figcaption>Figura 4 — Taxa de sobrevida por categoria. O gradiente do estadiamento é
+acentuado: 69,8% no Estádio I contra 5,5% no Estádio IV. <code>LDCT Screening</code>
+associa-se a 59,7% de sobrevida contra 27,2% do <code>PET Scan</code>, refletindo que
+rastreio detecta doença precoce enquanto PET costuma investigar doença já avançada.</figcaption>
+</figure>
+
+<h3>3.4 Vazamento de dados: identificação e remoção</h3>
+<p>
+Três colunas foram removidas <strong>antes de qualquer divisão dos dados</strong>,
+por representarem informação inexistente no instante da predição.
+</p>
+
+<table>
+<tr><th style="width:22%">Coluna</th><th style="width:20%">Tipo de vazamento</th><th>Evidência e justificativa</th></tr>
+<tr><td><code>Survival_Months</code></td><td>Vazamento de alvo</td><td>É o próprio desfecho expresso em outra escala. AUC univariada de 0,778 — sozinha, quase iguala o modelo completo. Só existe depois que o desfecho ocorreu.</td></tr>
+<tr><td><code>Treatment</code></td><td>Vazamento temporal</td><td>Decisão clínica posterior ao diagnóstico. A categoria <code>Palliative Care</code> (13,7% de sobrevida) codifica diretamente o prognóstico atribuído pelo médico — o modelo estaria copiando o julgamento humano, não prevendo o desfecho.</td></tr>
+<tr><td><code>Patient_ID</code>, <code>Diagnosis_Date</code></td><td>Identificadores</td><td>Sem conteúdo preditivo; risco de memorização. <code>Diagnosis_Date</code> é usada apenas para construir a divisão temporal de robustez.</td></tr>
+</table>
+
+<div class="warn">
+<strong>Prova de que <code>Survival_Months</code> não é observável no diagnóstico.</strong>
+Cruzando o tempo de sobrevida com o ano de diagnóstico, <strong>437 pacientes (21,9%)
+apresentam sobrevida maior que o seguimento fisicamente possível</strong> — há registros
+de diagnóstico em 2026 com mais de 100 meses de sobrevida acumulada. É impossível
+por construção do calendário. A coluna é um valor atribuído após o desfecho, não
+uma medição disponível na data do diagnóstico. O painel central da Figura 5 mostra
+em vermelho todos os casos que violam essa fronteira.
+</div>
+
+<figure>
+<img src="figures/06_eda_vazamento.png">
+<figcaption>Figura 5 — Evidência de vazamento. À esquerda, a separação que
+<code>Survival_Months</code> produz entre as classes. Ao centro, a incoerência
+temporal: a linha preta marca o seguimento máximo possível e os pontos vermelhos
+são os 437 casos impossíveis. À direita, o gradiente de sobrevida por tratamento,
+que revela <code>Treatment</code> como proxy do prognóstico médico.</figcaption>
+</figure>
+
+<h3>3.5 Redundâncias determinísticas</h3>
+<p>
+A EDA identificou colunas que são função exata de outras. Todas foram confirmadas
+por teste automatizado (regras R9, Seção 9) e valem em 100% dos registros:
+</p>
+
+<table>
+<tr><th style="width:28%">Coluna derivada</th><th>Fórmula exata verificada</th><th style="width:16%">Decisão</th></tr>
+<tr><td><code>Pack_Years</code></td><td><code>Cigarettes_Per_Day / 20 × Years_Smoking</code></td><td>mantida</td></tr>
+<tr><td><code>Symptom_Count</code></td><td>soma dos 10 sintomas binários</td><td>mantida</td></tr>
+<tr><td><code>Risk_Factor_Count</code></td><td>soma dos 7 fatores de risco + indicador de poluição alta</td><td>mantida</td></tr>
+<tr><td><code>Age_Group</code></td><td>discretização exata de <code>Age</code> em faixas decenais</td><td><strong>removida</strong></td></tr>
+<tr><td><code>BMI_Category</code></td><td>discretização exata de <code>BMI</code> nos cortes da OMS</td><td><strong>removida</strong></td></tr>
+</table>
+
+<p>
+O critério de decisão foi a perda de informação. <code>Age_Group</code> e
+<code>BMI_Category</code> são discretizações estritamente <em>lossy</em> de
+variáveis contínuas já presentes: não acrescentam nada e apenas degradam a
+resolução, por isso saíram. Os três agregados foram mantidos porque comprimem
+informação de forma útil a modelos de árvore, que não conseguem somar colunas
+sozinhos. A colinearidade que introduzem em modelos lineares é tratada pela
+regularização L1, que elimina o que for redundante.
+</p>
+
+<p>
+Duas outras redundâncias foram documentadas mas não exigiram remoção, por serem
+implicações lógicas e não identidades: <code>Stage IV ⟹ Metastasis = Yes</code>
+(476 de 476 casos) e <code>SCLC ⟹ NSCLC_Subtype = 'Not Applicable'</code>
+(229 de 229). <code>Country</code> foi removida por cardinalidade: 60 níveis, com
+categorias de apenas 5 observações, o que produziria colunas dummy quase vazias;
+<code>WHO_Region</code> preserva o sinal geográfico com 6 níveis estáveis.
+</p>
+
+<figure>
+<img src="figures/05_eda_correlacao.png">
+<figcaption>Figura 6 — Correlação de Spearman entre variáveis numéricas e o alvo.
+O bloco de correlação perfeita entre <code>Cigarettes_Per_Day</code>,
+<code>Years_Smoking</code> e <code>Pack_Years</code> é a assinatura da derivação
+determinística descrita acima.</figcaption>
+</figure>
+
+<h3>3.6 Transformações aplicadas</h3>
+<p>
+Todas as transformações estão declaradas em <code>src/features.py</code> como um
+<code>ColumnTransformer</code> que vive dentro do <code>Pipeline</code>:
+</p>
+
+<table>
+<tr><th style="width:20%">Grupo</th><th style="width:8%">N</th><th style="width:30%">Transformação</th><th>Justificativa</th></tr>
+<tr><td>Numéricas</td><td class="num">9</td><td>imputação por mediana → <code>StandardScaler</code></td><td>Regressão Logística exige escalas comparáveis para que a penalização L1 atue de forma uniforme entre as variáveis</td></tr>
+<tr><td>Binárias</td><td class="num">18</td><td><code>OrdinalEncoder</code> com categorias fixas <code>[No, Yes]</code></td><td>Fixar as categorias impede que a codificação mude entre folds conforme os níveis presentes</td></tr>
+<tr><td>Ordinais</td><td class="num">5</td><td><code>OrdinalEncoder</code> com ordem clínica explícita → escalonamento</td><td><code>Cancer_Stage</code> (I&lt;II&lt;III&lt;IV), exposição, consumo de álcool, exercício e tabagismo têm ordem real; codificá-las como nominais descartaria essa estrutura</td></tr>
+<tr><td>Nominais</td><td class="num">6</td><td><code>OneHotEncoder</code> com <code>min_frequency=10</code></td><td>Agrupa níveis raros em uma categoria única, evitando colunas quase vazias que induzem sobreajuste</td></tr>
+</table>
+
+<p>
+Resultado: 38 colunas de entrada geram 63 atributos após a transformação. O
+parâmetro <code>remainder="drop"</code> funciona como camada extra de segurança —
+qualquer coluna não declarada explicitamente é descartada, de modo que uma coluna
+com vazamento que escapasse da política de exclusão ainda assim não chegaria ao
+modelo.
+</p>
+
+<h2 class="pb">4. Estratégia experimental</h2>
+
+<h3>4.1 Divisão dos dados</h3>
+<p>
+A divisão é <strong>hold-out estratificado 80/20</strong>, complementado por
+validação cruzada dentro do treino:
+</p>
+
+<table>
+<tr><th style="width:24%">Conjunto</th><th style="width:12%">N</th><th style="width:14%">% positivos</th><th>Papel</th></tr>
+<tr><td>Treino</td><td class="num">1.600</td><td class="num">37,8%</td><td>Triagem de candidatos, ajuste de hiperparâmetros, calibração do limiar</td></tr>
+<tr><td>Teste (hold-out)</td><td class="num">400</td><td class="num">37,8%</td><td>Estimativa final, usada <strong>uma única vez</strong></td></tr>
+</table>
+
+<p>
+Dentro do treino, a validação cruzada faz o papel do conjunto de validação. Essa
+escolha foi preferida a um <em>split</em> treino/validação/teste em três partes
+porque, com 2.000 registros, reservar uma terceira partição deixaria cada
+conjunto pequeno demais e as estimativas instáveis. A validação cruzada usa todo
+o treino em rotação, entregando estimativas de menor variância com o mesmo volume
+de dados.
+</p>
+
+<h3>4.2 Validação cruzada: por que repetida</h3>
+
+<div class="warn">
+<strong>Erro cometido e corrigido no desenvolvimento.</strong> A primeira versão
+deste projeto usou <code>StratifiedKFold</code> de 5 folds para escolher
+hiperparâmetros. O desvio-padrão entre folds era de ±0,034, enquanto as
+diferenças entre configurações de <code>C</code> ficavam em torno de 0,003 — uma
+ordem de grandeza menor. Nessas condições, <code>GridSearchCV</code> escolhe pelo
+máximo numérico de uma estimativa dominada por ruído. O resultado foi a seleção de
+C&nbsp;=&nbsp;0,03, que <strong>zera 61 dos 63 coeficientes</strong> e reduz o modelo
+a uma única variável, sem que isso representasse ganho real de desempenho.
+</div>
+
+<p>
+A correção foi adotar <code>RepeatedStratifiedKFold</code>. Repetir a validação
+cruzada com diferentes particionamentos reduz o erro padrão da estimativa pela
+raiz do número de repetições:
+</p>
+
+<table>
+<tr><th>Etapa</th><th style="width:22%">Esquema</th><th style="width:14%">Estimativas</th><th class="num" style="width:16%">Erro padrão</th><th>Uso</th></tr>
+<tr><td>Triagem</td><td>5 folds simples</td><td class="num">5</td><td class="num">~0,015</td><td>Descartar candidatos claramente inferiores</td></tr>
+<tr><td>Ajuste de hiperparâmetros</td><td>5 × 3 repetições</td><td class="num">15</td><td class="num">~0,009</td><td>Escolher configuração dentro de cada família</td></tr>
+<tr><td>Comparação final</td><td>5 × 5 repetições</td><td class="num">25</td><td class="num">~0,005</td><td>Escolher a família vencedora</td></tr>
+</table>
+
+<h3>4.3 Regra de decisão para a escolha do modelo</h3>
+<p>
+A escolha final não é feita pelo simples máximo. Reporta-se a média e o erro
+padrão de cada candidato, e modelos cuja média esteja dentro de um erro padrão do
+melhor são tratados como <strong>empate técnico</strong> — a diferença entre eles
+é ruído da estimativa, não evidência de superioridade. Entre os empatados,
+escolhe-se o de maior média.
+</p>
+
+<h3>4.4 Protocolo anti-vazamento</h3>
+<p>
+Seis medidas concretas garantem que a estimativa de desempenho seja honesta:
+</p>
+<ol>
+<li><strong>Colunas pós-desfecho removidas antes da divisão.</strong> A exclusão acontece em <code>src/data.py</code>, antes de qualquer <em>split</em>, para que nenhuma etapa posterior possa reintroduzi-las.</li>
+<li><strong>Divisão antes de qualquer ajuste.</strong> Nenhuma estatística é calculada sobre o dataset completo.</li>
+<li><strong>Pré-processamento dentro do <code>Pipeline</code>.</strong> Médias, desvios, medianas e vocabulários de categorias são aprendidos apenas nos folds de treino e aplicados aos demais. Este é o ponto onde a maior parte dos projetos de ML vaza sem perceber.</li>
+<li><strong>Seleção de modelo e ajuste usam só o treino.</strong> O teste não participa de nenhuma decisão.</li>
+<li><strong>Limiar calibrado por <code>cross_val_predict</code> no treino.</strong> O limiar é um hiperparâmetro; escolhê-lo olhando o teste seria vazamento.</li>
+<li><strong>Teste tocado uma única vez.</strong> Apenas ao final, para reportar.</li>
+</ol>
+
+<h3>4.5 Teste de robustez temporal</h3>
+<p>
+Como verificação adicional, o experimento foi repetido com divisão por ano de
+diagnóstico — treino com registros anteriores a 2024 (n&nbsp;=&nbsp;1.387) e teste
+com 2024 em diante (n&nbsp;=&nbsp;613). Essa divisão simula o uso real do modelo:
+treinar com o histórico disponível e prever pacientes futuros. É mais pessimista
+que o hold-out aleatório sempre que existe deriva temporal.
+</p>
+
+<h2>5. Modelagem</h2>
+
+<h3>5.1 Candidatos avaliados</h3>
+
+<table>
+<tr><th style="width:26%">Modelo</th><th>Justificativa da escolha</th></tr>
+<tr><td>Baseline (classe majoritária)</td><td>Piso de referência. Qualquer modelo precisa superá-lo para justificar sua existência.</td></tr>
+<tr><td>Árvore de Decisão</td><td>Interpretável e com controle direto de complexidade; útil para expor o efeito da profundidade sobre o sobreajuste.</td></tr>
+<tr><td>Regressão Logística</td><td>Linear, produz probabilidades, coeficientes lidos como razão de chances. A penalização L1 lida com a colinearidade introduzida pelos agregados derivados.</td></tr>
+<tr><td>Random Forest</td><td><em>Bagging</em>: baixa variância, robusto, pouco sensível a hiperparâmetros.</td></tr>
+<tr><td>Gradient Boosting (HistGB)</td><td><em>Boosting</em> histogramado; referência em dados tabulares e candidato natural a vencer.</td></tr>
+</table>
+
+<h3>5.2 Triagem com hiperparâmetros padrão</h3>
+
+<table>
+<tr><th>Modelo</th><th class="num">ROC-AUC CV</th><th class="num">ROC-AUC treino</th><th class="num">Gap</th><th class="num">F1 CV</th></tr>
+<tr><td>Regressão Logística</td><td class="num">0,8017 ± 0,0322</td><td class="num">0,8371</td><td class="num">+0,035</td><td class="num">0,692</td></tr>
+<tr><td>Random Forest</td><td class="num">0,7952 ± 0,0217</td><td class="num">1,0000</td><td class="num">+0,205</td><td class="num">0,625</td></tr>
+<tr><td>Gradient Boosting (HistGB)</td><td class="num">0,7902 ± 0,0279</td><td class="num">0,9671</td><td class="num">+0,177</td><td class="num">0,675</td></tr>
+<tr><td>Árvore de Decisão</td><td class="num">0,6390 ± 0,0158</td><td class="num">1,0000</td><td class="num">+0,361</td><td class="num">0,551</td></tr>
+<tr><td>Baseline</td><td class="num">0,5000</td><td class="num">0,5000</td><td class="num">0,000</td><td class="num">0,000</td></tr>
+</table>
+
+<p>
+Os três modelos de árvore memorizam o treino sem hiperparâmetros de controle:
+Random Forest e Árvore de Decisão atingem ROC-AUC 1,000 no treino contra 0,795 e
+0,639 em validação. A Regressão Logística já parte com gap de apenas 0,035, o que
+antecipa o resultado final.
+</p>
+
+<h3>5.3 Ajuste de hiperparâmetros</h3>
+
+<table>
+<tr><th style="width:24%">Modelo</th><th style="width:10%">Espaço</th><th style="width:22%">Estratégia</th><th>Melhor configuração</th></tr>
+<tr><td>Árvore de Decisão</td><td class="num">60</td><td>Randomized, 12 amostras</td><td><code>criterion=entropy, max_depth=3, min_samples_leaf=20</code></td></tr>
+<tr><td>Regressão Logística</td><td class="num">14</td><td>Grid exaustivo</td><td><code>C=0.1, penalty=l1</code></td></tr>
+<tr><td>Random Forest</td><td class="num">8</td><td>Grid exaustivo</td><td><code>n_estimators=300, max_depth=6, max_features=0.4, min_samples_leaf=15</code></td></tr>
+<tr><td>Gradient Boosting</td><td class="num">54</td><td>Randomized, 12 amostras</td><td><code>learning_rate=0.03, max_leaf_nodes=15, min_samples_leaf=40, l2=0.0, max_iter=300</code></td></tr>
+</table>
+
+<p>
+Todos os candidatos foram ajustados, e não apenas o vencedor da triagem: a ordem
+com hiperparâmetros padrão pode se inverter depois do ajuste. A Árvore de Decisão
+é o exemplo — saltou de 0,639 para 0,808 quando a profundidade foi limitada a 3.
+</p>
+
+<h3>5.4 Comparação final e modelo escolhido</h3>
+
+<table>
+<tr><th>Modelo</th><th class="num" style="width:22%">ROC-AUC (CV 5×5)</th><th class="num" style="width:16%">Erro padrão</th><th style="width:20%">Situação</th></tr>
+<tr><td class="hl"><strong>Regressão Logística</strong></td><td class="num hl"><strong>0,8144</strong></td><td class="num hl">0,0050</td><td class="hl"><strong>escolhido</strong></td></tr>
+<tr><td>Random Forest</td><td class="num">0,8094</td><td class="num">0,0043</td><td>empate técnico</td></tr>
+<tr><td>Árvore de Decisão</td><td class="num">0,8079</td><td class="num">0,0043</td><td>fora de 1 EP</td></tr>
+<tr><td>Gradient Boosting (HistGB)</td><td class="num">0,8002</td><td class="num">0,0044</td><td>fora de 1 EP</td></tr>
+</table>
+
+<p>
+A Regressão Logística vence, mas a leitura correta é que <strong>as quatro
+famílias convergem para a mesma faixa de 0,80 a 0,81</strong>. Quando modelos com
+capacidades tão diferentes — de uma árvore de profundidade 3 a um <em>ensemble</em>
+de 300 árvores — chegam ao mesmo desempenho, o limitante não é o algoritmo: é a
+quantidade de informação disponível nos dados. A Seção 7.2 quantifica isso.
+</p>
+
+<h3>5.5 Configuração do modelo final</h3>
+
+<table>
+<tr><th style="width:30%">Componente</th><th>Configuração</th></tr>
+<tr><td>Algoritmo</td><td><code>LogisticRegression</code> (scikit-learn 1.8.0)</td></tr>
+<tr><td>Regularização</td><td>L1 (Lasso), <code>C = 0,1</code> — equivale a λ = 10</td></tr>
+<tr><td><em>Solver</em></td><td><code>liblinear</code> (necessário para L1 em problema binário)</td></tr>
+<tr><td>Desbalanceamento</td><td><code>class_weight='balanced'</code> — pondera as classes pelo inverso da frequência</td></tr>
+<tr><td>Limiar de decisão</td><td><strong>0,464</strong>, calibrado por <code>cross_val_predict</code> no treino para maximizar F1</td></tr>
+<tr><td>Atributos ativos</td><td><strong>8 de 63</strong> (a penalização L1 zerou 55)</td></tr>
+<tr><td>Semente</td><td><code>random_state = 42</code> em toda divisão e estimador</td></tr>
+</table>
+
+<p>
+Sobre o tratamento do desbalanceamento: com razão de 1,65:1, optou-se por
+<code>class_weight='balanced'</code> em vez de sobreamostragem sintética do tipo
+SMOTE. A ponderação por classe atinge o mesmo objetivo sem fabricar registros de
+pacientes inexistentes e sem o risco de vazamento que a reamostragem introduz
+quando aplicada fora do <em>pipeline</em> de validação cruzada.
+</p>
+
+<h2 class="pb">6. Avaliação</h2>
+
+<h3>6.1 Métricas escolhidas e por quê</h3>
+<table>
+<tr><th style="width:22%">Métrica</th><th>Papel no problema</th></tr>
+<tr><td><strong>ROC-AUC</strong></td><td>Métrica de seleção. Independe do limiar e da prevalência; mede a capacidade de ordenar pacientes por risco, que é o uso clínico pretendido.</td></tr>
+<tr><td><strong>PR-AUC</strong></td><td>Mais sensível ao desempenho na classe minoritária (sobreviventes, 37,8%).</td></tr>
+<tr><td><strong>Revocação</strong></td><td>Fração de sobreviventes corretamente identificados. Alta revocação evita subestimar a chance de um paciente e negar-lhe tratamento agressivo.</td></tr>
+<tr><td><strong>F1</strong></td><td>Equilíbrio entre precisão e revocação; usado para calibrar o limiar.</td></tr>
+<tr><td><strong>Acurácia balanceada</strong></td><td>Média das revocações das duas classes; não é inflada pela classe majoritária.</td></tr>
+<tr><td><strong>MCC</strong></td><td>Coeficiente de correlação de Matthews; robusto a desbalanceamento, usa as quatro células da matriz de confusão.</td></tr>
+<tr><td><strong>Brier</strong></td><td>Erro quadrático das probabilidades; avalia calibração, não apenas ordenação.</td></tr>
+</table>
+
+<h3>6.2 Resultados</h3>
+
+<table>
+<tr><th>Conjunto</th><th class="num">ROC-AUC</th><th class="num">PR-AUC</th><th class="num">Acurácia</th><th class="num">Acur. bal.</th><th class="num">Precisão</th><th class="num">Revocação</th><th class="num">F1</th><th class="num">MCC</th><th class="num">Brier</th></tr>
+<tr><td>Treino (reajuste)</td><td class="num">0,8263</td><td class="num">0,6970</td><td class="num">0,7475</td><td class="num">0,7704</td><td class="num">0,6189</td><td class="num">0,8645</td><td class="num">0,7214</td><td class="num">0,5254</td><td class="num">0,1707</td></tr>
+<tr><td>Validação cruzada (OOF)</td><td class="num">0,8126</td><td class="num">0,6582</td><td class="num">0,7475</td><td class="num">0,7704</td><td class="num">0,6189</td><td class="num">0,8645</td><td class="num">0,7214</td><td class="num">0,5254</td><td class="num">0,1738</td></tr>
+<tr><td class="hl"><strong>Teste (hold-out)</strong></td><td class="num hl"><strong>0,7783</strong></td><td class="num hl">0,6308</td><td class="num hl">0,7075</td><td class="num hl">0,7325</td><td class="num hl">0,5780</td><td class="num hl">0,8344</td><td class="num hl">0,6829</td><td class="num hl">0,4526</td><td class="num hl">0,1951</td></tr>
+<tr><td>Teste temporal (≥ 2024)</td><td class="num">0,8091</td><td class="num">0,6840</td><td class="num">0,7390</td><td class="num">0,7603</td><td class="num">0,6205</td><td class="num">0,8583</td><td class="num">0,7203</td><td class="num">0,5099</td><td class="num">0,1776</td></tr>
+</table>
+
+<div class="ok">
+O modelo supera com folga o baseline: <strong>ROC-AUC 0,778 contra 0,500</strong>,
+e acurácia balanceada 0,732 contra 0,500. A divisão temporal — mais exigente por
+construção — entrega <strong>0,809</strong>, acima do hold-out aleatório, o que
+indica ausência de deriva temporal prejudicial e reforça a estabilidade da
+estimativa.
+</div>
+
+<h3>6.3 Matriz de confusão e curvas</h3>
+
+<table>
+<tr><th style="width:34%">Teste (n = 400, limiar 0,464)</th><th class="num">Previsto: não sobrevive</th><th class="num">Previsto: sobrevive</th></tr>
+<tr><td><strong>Real: não sobreviveu (249)</strong></td><td class="num">157 <span class="small">(VN)</span></td><td class="num">92 <span class="small">(FP)</span></td></tr>
+<tr><td><strong>Real: sobreviveu (151)</strong></td><td class="num">25 <span class="small">(FN)</span></td><td class="num">126 <span class="small">(VP)</span></td></tr>
+</table>
+
+<p>
+O perfil de erro é assimétrico por escolha deliberada: 92 falsos positivos contra
+apenas 25 falsos negativos. O limiar calibrado privilegia revocação (0,834), de
+modo que o modelo raramente classifica como condenado um paciente que sobreviveria.
+Num contexto clínico de triagem, essa assimetria é a desejável — o custo de
+subestimar a chance de um paciente e negar-lhe tratamento agressivo é maior que o
+custo de um otimismo que será corrigido pelo acompanhamento.
+</p>
+
+<figure>
+<img src="figures/08_avaliacao.png">
+<figcaption>Figura 7 — Matriz de confusão, curva ROC (AUC 0,778), curva
+precisão-revocação (AP 0,631 contra base de 0,378) e curva de calibração
+(Brier 0,195).</figcaption>
+</figure>
+
+<figure>
+<img src="figures/09_limiar.png">
+<figcaption>Figura 8 — À esquerda, métricas em função do limiar. A curva de F1 é
+achatada em torno do ótimo, indicando que a escolha do limiar não é frágil. À
+direita, a distribuição dos escores por classe no teste: há separação clara nos
+extremos e uma zona central de sobreposição, que corresponde aos estádios II e III.</figcaption>
+</figure>
+
+<h2 class="pb">7. Análise dos resultados</h2>
+
+<h3>7.1 Underfitting e overfitting</h3>
+
+<table>
+<tr><th style="width:34%">Comparação</th><th class="num" style="width:16%">Gap de ROC-AUC</th><th>Leitura</th></tr>
+<tr><td>Treino − Teste</td><td class="num">+0,0480</td><td>Sobreajuste leve, dentro do esperado</td></tr>
+<tr><td>Validação cruzada − Teste</td><td class="num">+0,0344</td><td>Parte do gap vem da variabilidade amostral do hold-out, não de memorização</td></tr>
+<tr><td>Treino − Validação cruzada</td><td class="num">+0,0137</td><td>Sobreajuste real do modelo é muito pequeno</td></tr>
+</table>
+
+<p>
+A curva de aprendizado confirma o diagnóstico. Com 128 amostras, o gap entre
+treino e validação é de 0,056; com 1.280, cai para 0,012 — o modelo converge em
+vez de divergir, assinatura de ausência de sobreajuste relevante. Ao mesmo tempo,
+a curva de validação <strong>satura em torno de 0,817 já a partir de 292
+amostras</strong> e permanece plana até o fim.
+</p>
+
+<table>
+<tr><th class="num">Amostras de treino</th><th class="num">ROC-AUC treino</th><th class="num">ROC-AUC validação</th><th class="num">Gap</th></tr>
+<tr><td class="num">128</td><td class="num">0,8643</td><td class="num">0,8087</td><td class="num">0,0557</td></tr>
+<tr><td class="num">292</td><td class="num">0,8608</td><td class="num">0,8161</td><td class="num">0,0447</td></tr>
+<tr><td class="num">621</td><td class="num">0,8455</td><td class="num">0,8159</td><td class="num">0,0296</td></tr>
+<tr><td class="num">950</td><td class="num">0,8383</td><td class="num">0,8182</td><td class="num">0,0200</td></tr>
+<tr><td class="num">1.280</td><td class="num">0,8271</td><td class="num">0,8154</td><td class="num">0,0117</td></tr>
+</table>
+
+<div class="box">
+<strong>Conclusão do diagnóstico.</strong> O modelo não está sobreajustado nem
+subajustado: está no teto do que estes dados permitem. Coletar mais pacientes com
+as mesmas variáveis não melhoraria o resultado — a curva de validação já é plana.
+Melhorar exigiria <em>outras</em> variáveis, não mais registros.
+</div>
+
+<figure>
+<img src="figures/10_curva_aprendizado.png">
+<figcaption>Figura 9 — Curva de aprendizado. As duas curvas convergem e a de
+validação satura, o que caracteriza um modelo limitado pela informação disponível
+nos dados, e não pela capacidade do algoritmo.</figcaption>
+</figure>
+
+<h3>7.2 O achado central: o modelo é um preditor de estádio</h3>
+<p>
+Para quantificar de onde vem o poder preditivo, partiu-se de um modelo com apenas
+<code>Cancer_Stage</code> e adicionaram-se blocos clínicos em ordem de
+disponibilidade, medindo o ganho com validação cruzada repetida 5×5:
+</p>
+
+<table>
+<tr><th>Bloco acumulado</th><th class="num" style="width:10%">Variáveis</th><th class="num" style="width:18%">ROC-AUC</th><th class="num" style="width:14%">Ganho</th><th style="width:20%">Relevância</th></tr>
+<tr><td class="hl">Estadiamento</td><td class="num hl">1</td><td class="num hl"><strong>0,8130 ± 0,0048</strong></td><td class="num hl">—</td><td class="hl">ponto de partida</td></tr>
+<tr><td>+ Tumor e metástase</td><td class="num">5</td><td class="num">0,8109 ± 0,0048</td><td class="num">−0,0020</td><td>dentro do ruído</td></tr>
+<tr><td>+ Método de diagnóstico</td><td class="num">6</td><td class="num">0,8109 ± 0,0048</td><td class="num">+0,0000</td><td>dentro do ruído</td></tr>
+<tr><td>+ Demografia</td><td class="num">10</td><td class="num">0,8106 ± 0,0055</td><td class="num">−0,0004</td><td>dentro do ruído</td></tr>
+<tr><td>+ Tabagismo e estilo de vida</td><td class="num">19</td><td class="num">0,8159 ± 0,0050</td><td class="num">+0,0053</td><td>marginal</td></tr>
+<tr><td>+ Sintomas</td><td class="num">30</td><td class="num">0,8154 ± 0,0051</td><td class="num">−0,0005</td><td>dentro do ruído</td></tr>
+<tr><td>+ Genética e comorbidades</td><td class="num">38</td><td class="num">0,8144 ± 0,0050</td><td class="num">−0,0010</td><td>dentro do ruído</td></tr>
+</table>
+
+<div class="warn">
+<strong>O resultado mais importante do trabalho.</strong> Acrescentar
+<strong>37 variáveis</strong> ao estadiamento produz ganho total de
+<strong>+0,0014 de ROC-AUC</strong> — equivalente a <strong>0,29 de um erro
+padrão</strong> da própria estimativa. Estatisticamente, é indistinguível de zero.
+Como referência absoluta: ordenar os pacientes apenas pelo estádio, sem modelo
+algum, já entrega ROC-AUC de <strong>0,806</strong>.
+</div>
+
+<p>
+Isso explica coerentemente três observações anteriores que, isoladas, pareciam
+desconexas: por que as quatro famílias de modelos convergem para a mesma faixa
+(Seção 5.4), por que a curva de validação satura com menos de 300 amostras
+(Seção 7.1) e por que a regularização L1 elimina 55 dos 63 atributos (Seção 7.3).
+As três são consequências de um mesmo fato — fora do estadiamento, o dataset
+contém pouquíssimo sinal.
+</p>
+
+<figure>
+<img src="figures/14_ablacao_blocos.png">
+<figcaption>Figura 10 — À esquerda, desempenho acumulado por bloco com barras de
+erro padrão; a linha vermelha marca o desempenho do estádio isolado, sem modelo. À
+direita, ganho marginal de cada bloco; barras cinzas indicam ganhos dentro do ruído
+da estimativa.</figcaption>
+</figure>
+
+<h3>7.3 Interpretação com SHAP e importância por permutação</h3>
+<p>
+A penalização L1 manteve 8 dos 63 atributos. Os valores SHAP foram calculados com
+<code>LinearExplainer</code>, que é exato para modelos lineares — sem amostragem
+nem aproximação.
+</p>
+
+<table>
+<tr><th style="width:26%">Atributo</th><th class="num" style="width:16%">Coeficiente</th><th class="num" style="width:14%">|SHAP| médio</th><th class="num" style="width:18%">Importância por permutação</th><th>Direção</th></tr>
+<tr><td class="hl"><code>Cancer_Stage</code></td><td class="num hl">−1,3929</td><td class="num hl">1,2940</td><td class="num hl">+0,2577</td><td class="hl">estádio maior reduz a sobrevida</td></tr>
+<tr><td><code>Coughing_Blood</code></td><td class="num">−0,1377</td><td class="num">0,0475</td><td class="num">+0,0010</td><td>hemoptise reduz a sobrevida</td></tr>
+<tr><td><code>Chest_Pain</code></td><td class="num">−0,0570</td><td class="num">0,0257</td><td class="num">≈ 0</td><td>dor torácica reduz a sobrevida</td></tr>
+<tr><td><code>Alcohol_Use</code></td><td class="num">−0,0534</td><td class="num">0,0452</td><td class="num">≈ 0</td><td>consumo maior reduz a sobrevida</td></tr>
+<tr><td><code>Gender_Male</code></td><td class="num">−0,0344</td><td class="num">0,0166</td><td class="num">+0,0003</td><td>sexo masculino reduz a sobrevida</td></tr>
+<tr><td><code>Fatigue</code></td><td class="num">−0,0136</td><td class="num">0,0059</td><td class="num">≈ 0</td><td>fadiga reduz a sobrevida</td></tr>
+<tr><td><code>Age</code></td><td class="num">+0,0639</td><td class="num">0,0547</td><td class="num">+0,0008</td><td><strong>idade maior aumenta a sobrevida (?)</strong></td></tr>
+<tr><td><code>Air_Pollution_Exposure</code></td><td class="num">+0,1254</td><td class="num">0,1033</td><td class="num">+0,0046</td><td><strong>poluição maior aumenta a sobrevida (?)</strong></td></tr>
+</table>
+
+<p>
+A concentração é extrema: o |SHAP| médio de <code>Cancer_Stage</code> é
+<strong>12,5 vezes maior</strong> que o do segundo colocado. Na importância por
+permutação, embaralhar o estadiamento derruba o ROC-AUC em 0,258, enquanto
+embaralhar qualquer outra variável produz queda inferior a 0,005 — dentro da
+própria incerteza da medida.
+</p>
+
+<p>
+Os seis coeficientes negativos são clinicamente coerentes: estádio avançado,
+hemoptise, dor torácica, fadiga, consumo de álcool e sexo masculino são todos
+associados a pior prognóstico na literatura oncológica. A magnitude é pequena, mas
+a direção é a esperada.
+</p>
+
+<figure>
+<img src="figures/12_shap.png">
+<figcaption>Figura 11 — Beeswarm SHAP. Cada ponto é um paciente do conjunto de
+teste. A dispersão horizontal de <code>Cancer_Stage</code> domina o gráfico; as
+demais variáveis formam faixas estreitas em torno de zero.</figcaption>
+</figure>
+
+<figure>
+<img src="figures/11_importancia.png">
+<figcaption>Figura 12 — À esquerda, importância por permutação medida no teste. À
+direita, os 8 coeficientes não nulos da Regressão Logística sobre variáveis
+padronizadas.</figcaption>
+</figure>
+
+<figure>
+<img src="figures/13_shap_casos.png">
+<figcaption>Figura 13 — Explicação SHAP de dois casos individuais do teste: o
+paciente com maior e o com menor probabilidade prevista. Mostra como a contribuição
+de cada variável se soma para formar a decisão em um caso concreto.</figcaption>
+</figure>
+
+<h3>7.4 Limitações identificadas</h3>
+
+<p><strong>(a) Dois coeficientes têm sinal clinicamente implausível.</strong>
+<code>Age</code> e <code>Air_Pollution_Exposure</code> aparecem com coeficiente
+positivo: pelo modelo, ser mais velho e estar mais exposto à poluição
+<em>aumentam</em> a probabilidade de sobreviver. Isso contradiz o conhecimento
+oncológico estabelecido. A análise <em>what-if</em> torna o efeito visível — num
+paciente idêntico em tudo o mais, o modelo prevê 0,533 aos 40 anos e 0,595 aos 80.
+A EDA confirma que o padrão está nos dados (33,5% de sobrevida sob poluição baixa
+contra 41,2% sob poluição alta), o que caracteriza <strong>artefato da geração
+sintética do dataset, não achado clínico</strong>. O modelo está aprendendo
+corretamente uma relação que não existe no mundo real.
+</p>
+
+<p><strong>(b) As probabilidades não são bem calibradas.</strong> A curva de
+calibração (Figura 7, painel direito) fica sistematicamente abaixo da diagonal: o
+modelo superestima a probabilidade de sobrevida. A causa é o
+<code>class_weight='balanced'</code>, que reequilibra as classes ao custo de
+distorcer as probabilidades absolutas. Isso é aceitável para ordenar pacientes por
+risco — o uso pretendido, medido por ROC-AUC —, mas inviabiliza ler a saída como
+probabilidade real. Corrigir exigiria <code>CalibratedClassifierCV</code> com
+<em>isotonic</em> ou <em>Platt scaling</em> aplicado sobre o treino.
+</p>
+
+<p><strong>(c) O dataset é sintético.</strong> Além da qualidade impossivelmente
+perfeita (zero ausentes, zero duplicatas, zero valores fora de faixa em 92.000
+células), há a incoerência temporal de 437 registros documentada na Seção 3.4.
+Nenhuma conclusão clínica deve ser extraída deste trabalho; o valor está no método.
+</p>
+
+<p><strong>(d) O modelo não substitui o estadiamento.</strong> Dado o resultado da
+Seção 7.2, um oncologista que use apenas a tabela de estadiamento TNM obtém
+desempenho estatisticamente equivalente ao deste modelo. O sistema não agrega
+informação sobre a prática clínica atual neste dataset.
+</p>
+
+<p><strong>(e) Ausência de dados de seguimento longitudinal.</strong> A tarefa é
+tratada como classificação binária porque o dataset não permite outra coisa. O
+enquadramento correto para prognóstico oncológico seria <strong>análise de
+sobrevivência</strong> (Kaplan-Meier, Cox, Random Survival Forest), que trata
+censura à direita e prevê tempo até o evento em vez de um rótulo binário. A
+existência de <code>Survival_Months</code> no dataset sugere que esse seria o
+desenho natural — mas a coluna não é utilizável, pelas razões da Seção 3.4.
+</p>
+
+<h3>7.5 O que o experimento de vazamento revelou</h3>
+<p>
+Um experimento dedicado (<code>src/leakage_experiment.py</code>) mediu o impacto
+das variáveis removidas, com hiperparâmetros reajustados em cada configuração para
+que a comparação fosse justa:
+</p>
+
+<table>
+<tr><th>Configuração</th><th class="num" style="width:16%">ROC-AUC CV</th><th class="num" style="width:16%">ROC-AUC teste</th><th class="num" style="width:14%">Δ vs. A</th></tr>
+<tr><td>A. Sem vazamento (modelo entregue)</td><td class="num">0,8161</td><td class="num">0,7824</td><td class="num">—</td></tr>
+<tr><td>B. + <code>Treatment</code></td><td class="num">0,8161</td><td class="num">0,7824</td><td class="num">+0,0000</td></tr>
+<tr><td>C. + <code>Survival_Months</code></td><td class="num">0,8139</td><td class="num">0,7750</td><td class="num">−0,0073</td></tr>
+<tr><td>D. + ambas</td><td class="num">0,8139</td><td class="num">0,7751</td><td class="num">−0,0073</td></tr>
+</table>
+
+<div class="box">
+<strong>Resultado contraintuitivo, e por que ele é honesto.</strong> As variáveis
+com vazamento <strong>não inflaram</strong> o desempenho. A explicação está na
+redundância: a correlação de Spearman entre <code>Survival_Months</code> e o
+estadiamento é de <strong>−0,878</strong>, e a mediana de sobrevida cai
+monotonicamente de 62 meses no Estádio I para 9 meses no Estádio IV. Como o
+estadiamento já está legitimamente disponível, as variáveis vazadas não trazem
+informação nova. A remoção continua obrigatória — no uso real elas simplesmente
+não existem no instante da predição —, mas neste dataset ela <strong>não custa
+nada em desempenho</strong>. Relatar isso, em vez de alegar uma inflação que não
+ocorreu, é parte da honestidade do trabalho.
+</div>
+
+<p>
+Como o vazamento de variáveis não produziu efeito mensurável aqui, foi construída
+uma demonstração controlada do tipo de vazamento que <em>de fato</em> infla
+resultados — o de pré-processamento. Com 2.000 amostras, 3.000 atributos de ruído
+puro e rótulos aleatórios, o desempenho verdadeiro é 0,500 por construção:
+</p>
+
+<table>
+<tr><th style="width:52%">Procedimento</th><th class="num">ROC-AUC aparente no teste</th><th class="num">Ilusão</th></tr>
+<tr><td>Seleção de 20 atributos ajustada no <strong>dataset inteiro</strong>, depois dividida</td><td class="num hl"><strong>0,6761</strong></td><td class="num hl">+0,176</td></tr>
+<tr><td>Mesma seleção <strong>dentro do <code>Pipeline</code></strong>, refeita a cada ajuste</td><td class="num">0,4900</td><td class="num">−0,010</td></tr>
+</table>
+
+<p>
+Ajustar a seleção de atributos antes da divisão produz ROC-AUC aparente de 0,676
+sobre dados que, por construção, não contêm sinal algum. É exatamente o erro que a
+arquitetura deste projeto impede: com o pré-processamento dentro do
+<code>Pipeline</code>, o mesmo procedimento devolve 0,490, corretamente próximo do
+acaso.
+</p>
+
+<figure>
+<img src="figures/07_experimento_vazamento.png">
+<figcaption>Figura 14 — Diagnóstico de vazamento. À esquerda e ao centro, a
+ablação das variáveis pós-desfecho. À direita, a demonstração controlada: a curva
+vermelha é a ilusão criada pelo vazamento de pré-processamento; a verde é o
+resultado correto.</figcaption>
+</figure>
+
+<h2 class="pb">8. Demonstração de funcionamento</h2>
+
+<p>
+O módulo <code>src/predict.py</code> carrega o modelo persistido em
+<code>models/model.joblib</code> e demonstra seu funcionamento em três formatos:
+predições sobre pacientes reais do conjunto de teste, três casos clínicos
+sintéticos construídos à mão e uma análise <em>what-if</em> variando uma única
+variável por vez. A execução completa está reproduzida abaixo.
+</p>
+
+<h3>8.1 Predições em pacientes reais do conjunto de teste</h3>
+<p>
+A amostra abaixo foi deliberadamente equilibrada entre acertos e erros, para não
+apresentar apenas os casos favoráveis. A acurácia sobre os 400 pacientes do teste
+é de 70,8%, e a distribuição de confiança das predições é de 226 de alta, 143 de
+média e 31 de baixa.
+</p>
+<pre>1. PREDICOES EM PACIENTES REAIS DO CONJUNTO DE TESTE
+==========================================================================================
+Patient_ID  Age Gender Cancer_Stage Metastasis  Tumor_Size_cm  prob_sobrevida      predicao confianca           real acerto
+   LC-1852   81   Male     Stage IV        Yes            6.1          0.1218 Não sobrevive      alta Não sobreviveu     OK
+   LC-1227   69   Male     Stage IV        Yes            7.4          0.1050 Não sobrevive      alta Não sobreviveu     OK
+   LC-1599   70 Female      Stage I         No            1.0          0.8401     Sobrevive      alta     Sobreviveu     OK
+   LC-0420   56 Female      Stage I         No            2.0          0.8499     Sobrevive      alta     Sobreviveu     OK
+   LC-0575   63   Male      Stage I         No            0.5          0.8399     Sobrevive      alta     Sobreviveu     OK
+   LC-1520   59 Female     Stage IV        Yes            7.7          0.0884 Não sobrevive      alta Não sobreviveu     OK
+   LC-0196   89   Male    Stage III         No            6.7          0.2765 Não sobrevive     média     Sobreviveu   ERRO
+   LC-1623   71 Female      Stage I         No            1.3          0.8615     Sobrevive      alta Não sobreviveu   ERRO
+   LC-1879   61 Female     Stage II         No            3.1          0.6169     Sobrevive     média Não sobreviveu   ERRO
+   LC-1627   67   Male      Stage I         No            2.5          0.8106     Sobrevive      alta Não sobreviveu   ERRO
+   LC-0808   56   Male      Stage I         No            2.3          0.8279     Sobrevive      alta Não sobreviveu   ERRO
+   LC-1672   57   Male      Stage I         No            0.8          0.8340     Sobrevive      alta Não sobreviveu   ERRO
+
+Acurácia no conjunto de teste completo (400 pacientes): 70.8%
+Distribuição da confiança das predições:
+confianca
+alta     226
+média    143
+baixa     31
+
+==========================================================================================</pre>
+
+<h3>8.2 Casos clínicos sintéticos e análise what-if</h3>
+<pre>=========================================================================================
+2. CASOS CLINICOS SINTETICOS
+==========================================================================================
+
+  Caso A — rastreio precoce, não fumante
+    estádio Stage I    tumor 1.8 cm   sintomas 1
+    probabilidade de sobrevida: 0.814  |################################        |
+    predição: Sobrevive  (confiança alta)
+
+  Caso B — doença avançada, tabagista pesado
+    estádio Stage IV   tumor 8.5 cm   sintomas 8
+    probabilidade de sobrevida: 0.100  |###                                     |
+    predição: Não sobrevive  (confiança alta)
+
+  Caso C — intermediário, quadro ambíguo
+    estádio Stage II   tumor 4.2 cm   sintomas 4
+    probabilidade de sobrevida: 0.566  |######################                  |
+    predição: Sobrevive  (confiança média)
+
+==========================================================================================
+3. ANALISE WHAT-IF — VARIANDO UMA UNICA VARIAVEL
+==========================================================================================
+
+  Efeito do estadiamento (demais variáveis fixas no Caso C):
+    Stage I    prob = 0.817  |################################        |  -&gt; Sobrevive
+    Stage II   prob = 0.566  |######################                  |  -&gt; Sobrevive
+    Stage III  prob = 0.276  |###########                             |  -&gt; Não sobrevive
+    Stage IV   prob = 0.100  |###                                     |  -&gt; Não sobrevive
+
+  Efeito da idade (Caso C, estádio II):
+    40 anos    prob = 0.533
+    50 anos    prob = 0.549
+    60 anos    prob = 0.565
+    70 anos    prob = 0.580
+    80 anos    prob = 0.595
+
+  Efeito da hemoptise (Coughing_Blood), Caso C:
+    Coughing_Blood = No   prob = 0.566
+    Coughing_Blood = Yes  prob = 0.532
+
+  Predições do teste exportadas -&gt; artifacts/predicoes_teste.csv</pre>
+
+<div class="box">
+<strong>Leitura da análise what-if.</strong> Mantendo todas as demais variáveis
+fixas no Caso C, mover o estadiamento de I para IV faz a probabilidade prevista cair
+de 0,817 para 0,100 — e inverte a decisão entre os estádios II e III. Nenhuma outra
+variável produz efeito comparável: variar a idade de 40 para 80 anos move a
+probabilidade de 0,533 para 0,595, e a presença de hemoptise a reduz de 0,566 para
+0,532. É a confirmação prática, caso a caso, do que a Seção 7.2 mostrou de forma
+agregada.
+</div>
+
+<h3>8.3 Execução do harness de validação</h3>
+<p>
+Toda execução de treinamento é precedida pela validação automática do contrato de
+dados. Saída real do <code>src/validate.py</code>:
+</p>
+<pre>VALIDACAO DO DATASET BRUTO
+  [OK]    R1 schema: 46 colunas esperadas presentes
+  [OK]    R1 schema: colunas numéricas com dtype numérico
+  [OK]    R2 alvo: sem valores ausentes
+  [OK]    R2 alvo: níveis == {&#x27;Yes&#x27;, &#x27;No&#x27;}
+  [OK]    R2 alvo: classe minoritária = 37.8% (&gt; 5%)
+  [OK]    R3 ausentes: 0 valores nulos no dataset
+  [OK]    R4 duplicidade: Patient_ID único
+  [OK]    R4 duplicidade: 0 linhas idênticas (sem ID)
+  ...
+  [OK]    R6 categorias: Swallowing_Difficulty binária Yes/No
+  [OK]    R6 categorias: Finger_Clubbing binária Yes/No
+  [OK]    R6 categorias: Metastasis binária Yes/No
+  [OK]    R7 coerência: &#x27;Never Smoked&#x27; =&gt; carga tabágica zero
+  [OK]    R7 coerência: SCLC =&gt; NSCLC_Subtype == &#x27;Not Applicable&#x27;
+  [OK]    R7 coerência: Stage IV =&gt; Metastasis == &#x27;Yes&#x27;
+  [OK]    R9 derivação: Pack_Years == Cigarettes_Per_Day/20 * Years_Smoking
+  [OK]    R9 derivação: Symptom_Count == soma dos 10 sintomas
+  [OK]    R9 derivação: Risk_Factor_Count == 7 fatores + poluição alta</pre>
+
+<div class="warn">
+<strong>Nota sobre a entrega.</strong> As saídas acima são as execuções reais dos
+módulos do repositório. Conforme exigido pelo enunciado, devem ser acompanhadas de
+<strong>screenshots ou gravação de tela</strong> capturados no ambiente do aluno,
+executando <code>bash run_all.sh</code> ou <code>python -m src.predict</code>.
+</div>
+
+<h2 class="pb">9. Extensão opcional: estrutura do harness</h2>
+
+<p>
+O enunciado recomenda a elaboração de um <em>harness</em> — contexto, instruções,
+ferramentas, regras e validações que garantam comportamento consistente e
+verificável. Neste projeto o harness não é um agente de IA generativa, e sim uma
+<strong>camada de contrato de dados executável</strong>, implementada em
+<code>src/config.py</code> e <code>src/validate.py</code>. A escolha foi
+deliberada: o risco real do projeto não era a geração de texto, era o vazamento
+silencioso de dados.
+</p>
+
+<h3>9.1 Contexto e ferramentas</h3>
+<table>
+<tr><th style="width:24%">Componente</th><th style="width:22%">Arquivo</th><th>Responsabilidade</th></tr>
+<tr><td><strong>Contexto</strong></td><td><code>src/config.py</code></td><td>Fonte única de verdade: schema esperado, definição do alvo, política de exclusão de colunas, faixas válidas, semente e parâmetros experimentais. Nenhum outro módulo redefine esses valores.</td></tr>
+<tr><td><strong>Regras e validações</strong></td><td><code>src/validate.py</code></td><td>Nove grupos de regras executáveis que interrompem a execução ao primeiro desvio.</td></tr>
+<tr><td><strong>Ferramenta de dados</strong></td><td><code>src/data.py</code></td><td>Ponto único de entrada para obter (X, y); aplica a exclusão de vazamento antes de qualquer divisão.</td></tr>
+<tr><td><strong>Ferramenta de transformação</strong></td><td><code>src/features.py</code></td><td><code>ColumnTransformer</code> com <code>remainder="drop"</code>, que descarta qualquer coluna não declarada.</td></tr>
+<tr><td><strong>Reprodutibilidade</strong></td><td><code>run_all.sh</code></td><td>Executa o projeto inteiro na ordem correta, do zero.</td></tr>
+</table>
+
+<h3>9.2 Regras de validação</h3>
+<table>
+<tr><th style="width:8%">Regra</th><th style="width:22%">Categoria</th><th>Verificação</th></tr>
+<tr><td><strong>R1</strong></td><td>Schema</td><td>As 46 colunas esperadas existem; numéricas têm dtype numérico</td></tr>
+<tr><td><strong>R2</strong></td><td>Alvo</td><td>Binário, sem ausentes, com as duas classes presentes e minoritária acima de 5%</td></tr>
+<tr><td><strong>R3</strong></td><td>Completude</td><td>Zero valores nulos nas colunas utilizadas</td></tr>
+<tr><td><strong>R4</strong></td><td>Duplicidade</td><td><code>Patient_ID</code> único; zero linhas idênticas ignorando o identificador</td></tr>
+<tr><td><strong>R5</strong></td><td>Domínio</td><td>Nove variáveis numéricas dentro de faixas clinicamente plausíveis</td></tr>
+<tr><td><strong>R6</strong></td><td>Vocabulário</td><td>Níveis categóricos observados pertencem ao conjunto esperado</td></tr>
+<tr><td><strong>R7</strong></td><td>Coerência clínica</td><td>Não fumante ⟹ carga tabágica zero; SCLC ⟹ subtipo "Not Applicable"; Estádio IV ⟹ metástase presente</td></tr>
+<tr><td class="hl"><strong>R8</strong></td><td class="hl">Anti-vazamento</td><td class="hl">Nenhuma coluna proibida sobrevive até a matriz de features; treino e teste sem interseção de índices nem de linhas</td></tr>
+<tr><td><strong>R9</strong></td><td>Derivação</td><td>Agregados continuam sendo função exata das colunas de origem</td></tr>
+</table>
+
+<p>
+A regra R8 é a mais importante do conjunto. Ela verifica explicitamente que
+nenhuma das colunas listadas em <code>DROP_ALWAYS</code> chegou à matriz de
+atributos, e que os conjuntos de treino e teste são disjuntos. Como a verificação
+é uma asserção que levanta exceção, é impossível treinar um modelo sobre dados que
+violem o contrato — a execução falha antes.
+</p>
+
+<h3>9.3 Reprodutibilidade</h3>
+<table>
+<tr><th style="width:32%">Mecanismo</th><th>Implementação</th></tr>
+<tr><td>Semente fixa</td><td><code>random_state = 42</code> em toda divisão, reamostragem e estimador</td></tr>
+<tr><td>Ambiente declarado</td><td><code>requirements.txt</code> com versões fixadas; a versão do scikit-learn é gravada dentro de <code>model.joblib</code></td></tr>
+<tr><td>Execução única</td><td><code>bash run_all.sh</code> reproduz todas as figuras e métricas do zero</td></tr>
+<tr><td>Artefatos persistidos</td><td>Métricas em JSON/CSV em <code>artifacts/</code>, permitindo conferência sem reexecutar</td></tr>
+<tr><td>Checkpoint</td><td>A busca de hiperparâmetros grava <code>artifacts/searches.joblib</code>; análises posteriores podem ser refeitas sem repetir a etapa cara</td></tr>
+</table>
+
+<h3>9.4 Estrutura do repositório</h3>
+<pre>.
+├── data/raw/lung_cancer_dataset.csv   dataset original, sem modificações
+├── src/
+│   ├── config.py             contexto: schema, política de exclusão, parâmetros
+│   ├── validate.py           harness: 9 grupos de regras que falham alto
+│   ├── data.py               carga, remoção de vazamento, divisões
+│   ├── features.py           ColumnTransformer (todo pré-processamento vive aqui)
+│   ├── models.py             5 candidatos + grades de busca
+│   ├── evaluation.py         métricas, calibração de limiar, relatórios
+│   ├── train.py              triagem, ajuste, limiar, avaliação final
+│   ├── interpret.py          curvas, importâncias, SHAP
+│   ├── leakage_experiment.py ablação de vazamento + demonstração controlada
+│   ├── ablation.py           valor incremental por bloco de variáveis
+│   └── predict.py            demonstração de funcionamento e what-if
+├── models/model.joblib       pipeline treinado + limiar + metadados
+├── artifacts/                métricas em JSON/CSV, predições, logs, checkpoint
+├── reports/
+│   ├── relatorio.pdf         este documento
+│   └── figures/              14 figuras geradas pelo código
+├── requirements.txt
+├── run_all.sh
+└── README.md</pre>
+
+<h2>10. Conclusão</h2>
+
+<p>
+O projeto entrega um classificador de sobrevida em câncer de pulmão com ROC-AUC de
+0,778 no conjunto de teste e 0,809 sob divisão temporal, construído sob um
+protocolo anti-vazamento de seis camadas e validado por um harness de nove grupos
+de regras executáveis.
+</p>
+
+<p>
+O resultado mais relevante, porém, é negativo — e é o que dá valor ao trabalho. A
+análise de ablação mostra que <strong>o estadiamento sozinho alcança ROC-AUC de
+0,813 e que as outras 37 variáveis agregam 0,29 de um erro padrão</strong>. Quatro
+famílias de algoritmos com capacidades muito distintas convergem para a mesma
+faixa de desempenho; a curva de aprendizado satura com menos de 300 amostras; a
+regularização L1 descarta 55 de 63 atributos. As três observações têm a mesma
+causa: fora do estadiamento, este dataset contém pouquíssima informação.
+</p>
+
+<p>
+Um modelo que apresentasse apenas o ROC-AUC de 0,778 pareceria um sucesso
+modesto. A ablação mostra que ele é, na prática, equivalente a consultar a tabela
+de estadiamento TNM. Chegar a essa conclusão exigiu justamente o rigor
+metodológico descrito nas Seções 4 e 7 — e ela teria passado despercebida sob um
+protocolo menos cuidadoso.
+</p>
+
+<div class="box">
+<strong>Três lições metodológicas registradas neste trabalho:</strong>
+<ol>
+<li><strong>Vazamento nem sempre infla o resultado.</strong> As variáveis pós-desfecho aqui eram redundantes com o estadiamento e sua remoção não custou desempenho. A remoção continua obrigatória por método, não por métrica.</li>
+<li><strong>Selecionar hiperparâmetros com CV ruidosa é sorteio.</strong> Com 5 folds, o desvio entre folds superava em dez vezes a diferença entre configurações, e a escolha resultante colapsou o modelo a uma única variável. A validação cruzada repetida corrigiu o problema.</li>
+<li><strong>Desempenho absoluto não diz se o modelo é útil.</strong> Só a comparação contra uma referência simples — neste caso, o próprio estadiamento — revela quanto o modelo realmente agrega.</li>
+</ol>
+</div>
+
+<p class="small center" style="margin-top:22px; color:#888;">
+Relatório gerado a partir dos artefatos em <code>artifacts/</code> e das figuras em
+<code>reports/figures/</code>, todos produzidos pelo código do repositório.
+Reprodução completa: <code>bash run_all.sh</code>.
+</p>
+
+</body>
+</html>

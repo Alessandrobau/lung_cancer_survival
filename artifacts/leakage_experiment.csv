@@ -1,0 +1,5 @@
+config,cv_roc_auc,test_roc_auc,best_params,delta_vs_A
+A. Sem vazamento (modelo entregue),0.8160845550064371,0.7823612330115162,"{'C': 0.03, 'penalty': 'l1'}",0.0
+B. + Treatment,0.8160845550064371,0.7823612330115162,"{'C': 0.03, 'penalty': 'l1'}",0.0
+C. + Survival_Months,0.8139208438888659,0.7750472087023591,"{'C': 0.1, 'penalty': 'l1'}",-0.007314024309157063
+D. + ambas,0.8139374558744134,0.7751004016064256,"{'C': 0.1, 'penalty': 'l1'}",-0.007260831405090595

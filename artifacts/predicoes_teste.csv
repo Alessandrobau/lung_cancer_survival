@@ -1,0 +1,401 @@
+Patient_ID,prob_sobrevida,predicao,confianca,real
+LC-0243,0.2479,Não sobrevive,média,Não sobreviveu
+LC-1198,0.2265,Não sobrevive,média,Não sobreviveu
+LC-1510,0.111,Não sobrevive,alta,Não sobreviveu
+LC-1678,0.1367,Não sobrevive,alta,Não sobreviveu
+LC-1218,0.846,Sobrevive,alta,Sobreviveu
+LC-0176,0.1154,Não sobrevive,alta,Não sobreviveu
+LC-0482,0.1363,Não sobrevive,alta,Não sobreviveu
+LC-0564,0.2413,Não sobrevive,média,Não sobreviveu
+LC-1122,0.6104,Sobrevive,média,Não sobreviveu
+LC-0355,0.0986,Não sobrevive,alta,Não sobreviveu
+LC-1852,0.1218,Não sobrevive,alta,Não sobreviveu
+LC-0100,0.8399,Sobrevive,alta,Sobreviveu
+LC-0893,0.1133,Não sobrevive,alta,Não sobreviveu
+LC-1739,0.8466,Sobrevive,alta,Sobreviveu
+LC-0527,0.5974,Sobrevive,média,Não sobreviveu
+LC-0178,0.7828,Sobrevive,alta,Sobreviveu
+LC-1954,0.2366,Não sobrevive,média,Sobreviveu
+LC-1022,0.8545,Sobrevive,alta,Não sobreviveu
+LC-1258,0.8529,Sobrevive,alta,Sobreviveu
+LC-1410,0.6102,Sobrevive,média,Sobreviveu
+LC-1312,0.1027,Não sobrevive,alta,Não sobreviveu
+LC-0094,0.8545,Sobrevive,alta,Sobreviveu
+LC-1623,0.8615,Sobrevive,alta,Não sobreviveu
+LC-0489,0.2598,Não sobrevive,média,Não sobreviveu
+LC-1514,0.0916,Não sobrevive,alta,Não sobreviveu
+LC-1951,0.5229,Sobrevive,baixa,Sobreviveu
+LC-1199,0.5342,Sobrevive,baixa,Não sobreviveu
+LC-0062,0.8408,Sobrevive,alta,Sobreviveu
+LC-0889,0.0956,Não sobrevive,alta,Não sobreviveu
+LC-1376,0.8457,Sobrevive,alta,Não sobreviveu
+LC-0151,0.8097,Sobrevive,alta,Sobreviveu
+LC-0870,0.2218,Não sobrevive,média,Não sobreviveu
+LC-0364,0.8217,Sobrevive,alta,Sobreviveu
+LC-1450,0.8186,Sobrevive,alta,Sobreviveu
+LC-1646,0.8093,Sobrevive,alta,Não sobreviveu
+LC-1607,0.5485,Sobrevive,baixa,Não sobreviveu
+LC-0122,0.5892,Sobrevive,média,Sobreviveu
+LC-0061,0.2647,Não sobrevive,média,Não sobreviveu
+LC-1831,0.8207,Sobrevive,alta,Não sobreviveu
+LC-0242,0.604,Sobrevive,média,Sobreviveu
+LC-1407,0.7983,Sobrevive,alta,Sobreviveu
+LC-0383,0.8659,Sobrevive,alta,Sobreviveu
+LC-0344,0.0868,Não sobrevive,alta,Não sobreviveu
+LC-0808,0.8279,Sobrevive,alta,Não sobreviveu
+LC-1374,0.8352,Sobrevive,alta,Sobreviveu
+LC-0828,0.8304,Sobrevive,alta,Não sobreviveu
+LC-1266,0.5949,Sobrevive,média,Sobreviveu
+LC-1899,0.8296,Sobrevive,alta,Sobreviveu
+LC-1844,0.2741,Não sobrevive,média,Não sobreviveu
+LC-0027,0.0796,Não sobrevive,alta,Não sobreviveu
+LC-0879,0.1058,Não sobrevive,alta,Não sobreviveu
+LC-1757,0.2299,Não sobrevive,média,Não sobreviveu
+LC-1233,0.3081,Não sobrevive,média,Não sobreviveu
+LC-0025,0.7757,Sobrevive,alta,Sobreviveu
+LC-0292,0.8101,Sobrevive,alta,Não sobreviveu
+LC-0266,0.7938,Sobrevive,alta,Sobreviveu
+LC-1332,0.8177,Sobrevive,alta,Sobreviveu
+LC-0113,0.8292,Sobrevive,alta,Sobreviveu
+LC-0106,0.2702,Não sobrevive,média,Sobreviveu
+LC-0634,0.0908,Não sobrevive,alta,Não sobreviveu
+LC-0983,0.5884,Sobrevive,média,Sobreviveu
+LC-1203,0.8336,Sobrevive,alta,Sobreviveu
+LC-1545,0.0838,Não sobrevive,alta,Não sobreviveu
+LC-0917,0.8321,Sobrevive,alta,Sobreviveu
+LC-1734,0.0949,Não sobrevive,alta,Não sobreviveu
+LC-0038,0.8027,Sobrevive,alta,Sobreviveu
+LC-1401,0.2446,Não sobrevive,média,Não sobreviveu
+LC-0329,0.3003,Não sobrevive,média,Não sobreviveu
+LC-1268,0.5693,Sobrevive,média,Não sobreviveu
+LC-0417,0.2498,Não sobrevive,média,Não sobreviveu
+LC-1285,0.5187,Sobrevive,baixa,Não sobreviveu
+LC-1338,0.8047,Sobrevive,alta,Sobreviveu
+LC-0524,0.8024,Sobrevive,alta,Sobreviveu
+LC-1240,0.5708,Sobrevive,média,Não sobreviveu
+LC-1034,0.8538,Sobrevive,alta,Não sobreviveu
+LC-0718,0.8598,Sobrevive,alta,Sobreviveu
+LC-0599,0.5083,Sobrevive,baixa,Sobreviveu
+LC-0270,0.0946,Não sobrevive,alta,Não sobreviveu
+LC-1507,0.627,Sobrevive,média,Não sobreviveu
+LC-0604,0.5578,Sobrevive,baixa,Sobreviveu
+LC-0161,0.8296,Sobrevive,alta,Sobreviveu
+LC-1962,0.0946,Não sobrevive,alta,Não sobreviveu
+LC-1908,0.6386,Sobrevive,média,Sobreviveu
+LC-1654,0.8097,Sobrevive,alta,Sobreviveu
+LC-1769,0.5393,Sobrevive,baixa,Não sobreviveu
+LC-1613,0.1021,Não sobrevive,alta,Não sobreviveu
+LC-1705,0.8458,Sobrevive,alta,Não sobreviveu
+LC-1126,0.8469,Sobrevive,alta,Não sobreviveu
+LC-1826,0.1041,Não sobrevive,alta,Não sobreviveu
+LC-1963,0.8126,Sobrevive,alta,Não sobreviveu
+LC-1390,0.0904,Não sobrevive,alta,Não sobreviveu
+LC-1090,0.2626,Não sobrevive,média,Não sobreviveu
+LC-1054,0.2281,Não sobrevive,média,Não sobreviveu
+LC-1494,0.5255,Sobrevive,baixa,Sobreviveu
+LC-1013,0.3118,Não sobrevive,média,Sobreviveu
+LC-1812,0.0934,Não sobrevive,alta,Não sobreviveu
+LC-1070,0.085,Não sobrevive,alta,Não sobreviveu
+LC-0272,0.8184,Sobrevive,alta,Não sobreviveu
+LC-0053,0.2533,Não sobrevive,média,Sobreviveu
+LC-0409,0.101,Não sobrevive,alta,Não sobreviveu
+LC-1421,0.7926,Sobrevive,alta,Não sobreviveu
+LC-0349,0.7952,Sobrevive,alta,Sobreviveu
+LC-0059,0.8382,Sobrevive,alta,Não sobreviveu
+LC-0575,0.8399,Sobrevive,alta,Sobreviveu
+LC-0023,0.7925,Sobrevive,alta,Sobreviveu
+LC-0265,0.0873,Não sobrevive,alta,Não sobreviveu
+LC-0643,0.1385,Não sobrevive,alta,Não sobreviveu
+LC-1516,0.3102,Não sobrevive,média,Não sobreviveu
+LC-1254,0.5724,Sobrevive,média,Sobreviveu
+LC-1660,0.1155,Não sobrevive,alta,Não sobreviveu
+LC-1361,0.6342,Sobrevive,média,Não sobreviveu
+LC-1693,0.1213,Não sobrevive,alta,Não sobreviveu
+LC-0746,0.2778,Não sobrevive,média,Não sobreviveu
+LC-0188,0.5641,Sobrevive,baixa,Sobreviveu
+LC-1786,0.8149,Sobrevive,alta,Não sobreviveu
+LC-1821,0.3053,Não sobrevive,média,Sobreviveu
+LC-1850,0.2951,Não sobrevive,média,Não sobreviveu
+LC-0770,0.7736,Sobrevive,alta,Sobreviveu
+LC-0346,0.0902,Não sobrevive,alta,Não sobreviveu
+LC-0662,0.2373,Não sobrevive,média,Não sobreviveu
+LC-0271,0.8255,Sobrevive,alta,Não sobreviveu
+LC-1743,0.6005,Sobrevive,média,Não sobreviveu
+LC-1924,0.1245,Não sobrevive,alta,Sobreviveu
+LC-0846,0.826,Sobrevive,alta,Sobreviveu
+LC-0809,0.2923,Não sobrevive,média,Não sobreviveu
+LC-0923,0.5838,Sobrevive,média,Sobreviveu
+LC-1658,0.8681,Sobrevive,alta,Não sobreviveu
+LC-1097,0.1025,Não sobrevive,alta,Não sobreviveu
+LC-0504,0.0801,Não sobrevive,alta,Sobreviveu
+LC-1596,0.7834,Sobrevive,alta,Sobreviveu
+LC-1581,0.8115,Sobrevive,alta,Não sobreviveu
+LC-1811,0.2689,Não sobrevive,média,Não sobreviveu
+LC-1893,0.3321,Não sobrevive,média,Não sobreviveu
+LC-0960,0.3073,Não sobrevive,média,Não sobreviveu
+LC-0487,0.5888,Sobrevive,média,Não sobreviveu
+LC-0929,0.3142,Não sobrevive,média,Não sobreviveu
+LC-1723,0.8481,Sobrevive,alta,Sobreviveu
+LC-1360,0.8469,Sobrevive,alta,Sobreviveu
+LC-0703,0.84,Sobrevive,alta,Sobreviveu
+LC-1370,0.1197,Não sobrevive,alta,Não sobreviveu
+LC-0234,0.2745,Não sobrevive,média,Não sobreviveu
+LC-1807,0.2699,Não sobrevive,média,Sobreviveu
+LC-0450,0.3109,Não sobrevive,média,Não sobreviveu
+LC-0465,0.3011,Não sobrevive,média,Não sobreviveu
+LC-0253,0.6257,Sobrevive,média,Sobreviveu
+LC-1007,0.0809,Não sobrevive,alta,Não sobreviveu
+LC-0749,0.0915,Não sobrevive,alta,Não sobreviveu
+LC-1302,0.2881,Não sobrevive,média,Sobreviveu
+LC-0890,0.3098,Não sobrevive,média,Não sobreviveu
+LC-0555,0.8207,Sobrevive,alta,Não sobreviveu
+LC-0854,0.8469,Sobrevive,alta,Sobreviveu
+LC-0916,0.8139,Sobrevive,alta,Não sobreviveu
+LC-1323,0.8322,Sobrevive,alta,Sobreviveu
+LC-1840,0.5858,Sobrevive,média,Sobreviveu
+LC-1627,0.8106,Sobrevive,alta,Não sobreviveu
+LC-0075,0.1267,Não sobrevive,alta,Não sobreviveu
+LC-1513,0.3383,Não sobrevive,média,Sobreviveu
+LC-0196,0.2765,Não sobrevive,média,Sobreviveu
+LC-0300,0.5034,Sobrevive,baixa,Sobreviveu
+LC-1647,0.573,Sobrevive,média,Não sobreviveu
+LC-1455,0.2732,Não sobrevive,média,Não sobreviveu
+LC-1877,0.6065,Sobrevive,média,Não sobreviveu
+LC-1934,0.5587,Sobrevive,baixa,Sobreviveu
+LC-0976,0.2452,Não sobrevive,média,Não sobreviveu
+LC-1201,0.82,Sobrevive,alta,Não sobreviveu
+LC-0160,0.2853,Não sobrevive,média,Não sobreviveu
+LC-1475,0.1052,Não sobrevive,alta,Não sobreviveu
+LC-0732,0.608,Sobrevive,média,Não sobreviveu
+LC-0716,0.1345,Não sobrevive,alta,Não sobreviveu
+LC-1749,0.5898,Sobrevive,média,Sobreviveu
+LC-1161,0.8483,Sobrevive,alta,Sobreviveu
+LC-0783,0.116,Não sobrevive,alta,Não sobreviveu
+LC-1873,0.307,Não sobrevive,média,Não sobreviveu
+LC-1896,0.8053,Sobrevive,alta,Sobreviveu
+LC-1588,0.7993,Sobrevive,alta,Sobreviveu
+LC-0460,0.3378,Não sobrevive,média,Não sobreviveu
+LC-1430,0.3266,Não sobrevive,média,Não sobreviveu
+LC-1555,0.5973,Sobrevive,média,Não sobreviveu
+LC-1808,0.1189,Não sobrevive,alta,Não sobreviveu
+LC-0891,0.8432,Sobrevive,alta,Não sobreviveu
+LC-1944,0.1174,Não sobrevive,alta,Não sobreviveu
+LC-1219,0.1025,Não sobrevive,alta,Não sobreviveu
+LC-1961,0.5305,Sobrevive,baixa,Não sobreviveu
+LC-1026,0.2326,Não sobrevive,média,Não sobreviveu
+LC-1406,0.11,Não sobrevive,alta,Não sobreviveu
+LC-1619,0.8053,Sobrevive,alta,Sobreviveu
+LC-1158,0.2714,Não sobrevive,média,Não sobreviveu
+LC-1761,0.108,Não sobrevive,alta,Não sobreviveu
+LC-0340,0.117,Não sobrevive,alta,Não sobreviveu
+LC-1334,0.8429,Sobrevive,alta,Não sobreviveu
+LC-1879,0.6169,Sobrevive,média,Não sobreviveu
+LC-0191,0.8274,Sobrevive,alta,Não sobreviveu
+LC-1663,0.5475,Sobrevive,baixa,Sobreviveu
+LC-0798,0.8437,Sobrevive,alta,Sobreviveu
+LC-1599,0.8401,Sobrevive,alta,Sobreviveu
+LC-0773,0.5167,Sobrevive,baixa,Não sobreviveu
+LC-1981,0.1241,Não sobrevive,alta,Não sobreviveu
+LC-1935,0.7958,Sobrevive,alta,Não sobreviveu
+LC-1614,0.2408,Não sobrevive,média,Não sobreviveu
+LC-1651,0.6116,Sobrevive,média,Sobreviveu
+LC-0640,0.5454,Sobrevive,baixa,Sobreviveu
+LC-0944,0.576,Sobrevive,média,Não sobreviveu
+LC-1559,0.8434,Sobrevive,alta,Sobreviveu
+LC-1724,0.1313,Não sobrevive,alta,Não sobreviveu
+LC-1541,0.2441,Não sobrevive,média,Não sobreviveu
+LC-0332,0.115,Não sobrevive,alta,Não sobreviveu
+LC-0220,0.2631,Não sobrevive,média,Não sobreviveu
+LC-0755,0.1135,Não sobrevive,alta,Não sobreviveu
+LC-1088,0.8374,Sobrevive,alta,Não sobreviveu
+LC-1797,0.2546,Não sobrevive,média,Não sobreviveu
+LC-1259,0.0747,Não sobrevive,alta,Não sobreviveu
+LC-0678,0.633,Sobrevive,média,Não sobreviveu
+LC-1611,0.605,Sobrevive,média,Não sobreviveu
+LC-0441,0.6086,Sobrevive,média,Não sobreviveu
+LC-0354,0.7941,Sobrevive,alta,Sobreviveu
+LC-1275,0.8295,Sobrevive,alta,Sobreviveu
+LC-0039,0.7717,Sobrevive,alta,Sobreviveu
+LC-0126,0.3172,Não sobrevive,média,Sobreviveu
+LC-1404,0.5829,Sobrevive,média,Não sobreviveu
+LC-1881,0.2439,Não sobrevive,média,Sobreviveu
+LC-1708,0.8453,Sobrevive,alta,Sobreviveu
+LC-0411,0.7865,Sobrevive,alta,Sobreviveu
+LC-1236,0.1183,Não sobrevive,alta,Não sobreviveu
+LC-1317,0.8205,Sobrevive,alta,Sobreviveu
+LC-0205,0.8197,Sobrevive,alta,Não sobreviveu
+LC-0655,0.3344,Não sobrevive,média,Não sobreviveu
+LC-1310,0.1281,Não sobrevive,alta,Sobreviveu
+LC-0169,0.1186,Não sobrevive,alta,Não sobreviveu
+LC-0132,0.6551,Sobrevive,média,Sobreviveu
+LC-0362,0.3281,Não sobrevive,média,Sobreviveu
+LC-0562,0.8269,Sobrevive,alta,Sobreviveu
+LC-0652,0.3071,Não sobrevive,média,Não sobreviveu
+LC-0295,0.8704,Sobrevive,alta,Sobreviveu
+LC-0568,0.2379,Não sobrevive,média,Sobreviveu
+LC-1890,0.8617,Sobrevive,alta,Não sobreviveu
+LC-1087,0.0875,Não sobrevive,alta,Não sobreviveu
+LC-0345,0.1097,Não sobrevive,alta,Não sobreviveu
+LC-1000,0.8485,Sobrevive,alta,Não sobreviveu
+LC-1965,0.1183,Não sobrevive,alta,Não sobreviveu
+LC-0959,0.5427,Sobrevive,baixa,Sobreviveu
+LC-0467,0.539,Sobrevive,baixa,Sobreviveu
+LC-0863,0.8427,Sobrevive,alta,Sobreviveu
+LC-1682,0.824,Sobrevive,alta,Sobreviveu
+LC-1702,0.1023,Não sobrevive,alta,Sobreviveu
+LC-1279,0.0814,Não sobrevive,alta,Não sobreviveu
+LC-0101,0.8168,Sobrevive,alta,Sobreviveu
+LC-1400,0.6134,Sobrevive,média,Não sobreviveu
+LC-0183,0.0834,Não sobrevive,alta,Não sobreviveu
+LC-0257,0.8317,Sobrevive,alta,Não sobreviveu
+LC-1150,0.7943,Sobrevive,alta,Não sobreviveu
+LC-1031,0.6169,Sobrevive,média,Não sobreviveu
+LC-1118,0.3242,Não sobrevive,média,Não sobreviveu
+LC-1701,0.0865,Não sobrevive,alta,Não sobreviveu
+LC-1387,0.8259,Sobrevive,alta,Não sobreviveu
+LC-0618,0.8349,Sobrevive,alta,Sobreviveu
+LC-0065,0.8258,Sobrevive,alta,Sobreviveu
+LC-1785,0.6494,Sobrevive,média,Sobreviveu
+LC-0633,0.1162,Não sobrevive,alta,Não sobreviveu
+LC-0619,0.2861,Não sobrevive,média,Não sobreviveu
+LC-1517,0.8217,Sobrevive,alta,Não sobreviveu
+LC-1622,0.2387,Não sobrevive,média,Não sobreviveu
+LC-1409,0.2516,Não sobrevive,média,Não sobreviveu
+LC-0026,0.5344,Sobrevive,baixa,Não sobreviveu
+LC-1197,0.1232,Não sobrevive,alta,Não sobreviveu
+LC-1782,0.2804,Não sobrevive,média,Não sobreviveu
+LC-0627,0.6722,Sobrevive,média,Não sobreviveu
+LC-0353,0.0921,Não sobrevive,alta,Não sobreviveu
+LC-1288,0.6205,Sobrevive,média,Sobreviveu
+LC-1264,0.7954,Sobrevive,alta,Não sobreviveu
+LC-0758,0.6034,Sobrevive,média,Não sobreviveu
+LC-1327,0.5653,Sobrevive,média,Não sobreviveu
+LC-1886,0.602,Sobrevive,média,Não sobreviveu
+LC-1096,0.3639,Não sobrevive,média,Não sobreviveu
+LC-1363,0.2782,Não sobrevive,média,Não sobreviveu
+LC-1802,0.8278,Sobrevive,alta,Sobreviveu
+LC-0642,0.31,Não sobrevive,média,Não sobreviveu
+LC-0223,0.8072,Sobrevive,alta,Sobreviveu
+LC-1485,0.6092,Sobrevive,média,Sobreviveu
+LC-1224,0.0808,Não sobrevive,alta,Não sobreviveu
+LC-0658,0.1107,Não sobrevive,alta,Não sobreviveu
+LC-0637,0.0739,Não sobrevive,alta,Não sobreviveu
+LC-1174,0.8373,Sobrevive,alta,Sobreviveu
+LC-1717,0.1209,Não sobrevive,alta,Não sobreviveu
+LC-1190,0.3025,Não sobrevive,média,Não sobreviveu
+LC-0219,0.8309,Sobrevive,alta,Não sobreviveu
+LC-1692,0.1186,Não sobrevive,alta,Não sobreviveu
+LC-0574,0.2796,Não sobrevive,média,Não sobreviveu
+LC-1451,0.2952,Não sobrevive,média,Não sobreviveu
+LC-1672,0.834,Sobrevive,alta,Não sobreviveu
+LC-0760,0.3267,Não sobrevive,média,Não sobreviveu
+LC-0649,0.6064,Sobrevive,média,Não sobreviveu
+LC-0074,0.5296,Sobrevive,baixa,Sobreviveu
+LC-1946,0.1398,Não sobrevive,alta,Não sobreviveu
+LC-0811,0.8042,Sobrevive,alta,Não sobreviveu
+LC-0995,0.0963,Não sobrevive,alta,Sobreviveu
+LC-1167,0.2321,Não sobrevive,média,Não sobreviveu
+LC-0628,0.599,Sobrevive,média,Não sobreviveu
+LC-0735,0.8246,Sobrevive,alta,Não sobreviveu
+LC-0420,0.8499,Sobrevive,alta,Sobreviveu
+LC-0284,0.0912,Não sobrevive,alta,Não sobreviveu
+LC-0377,0.6628,Sobrevive,média,Não sobreviveu
+LC-1135,0.2866,Não sobrevive,média,Não sobreviveu
+LC-1876,0.1198,Não sobrevive,alta,Sobreviveu
+LC-1331,0.6322,Sobrevive,média,Sobreviveu
+LC-0393,0.1062,Não sobrevive,alta,Não sobreviveu
+LC-0852,0.134,Não sobrevive,alta,Não sobreviveu
+LC-1898,0.2884,Não sobrevive,média,Não sobreviveu
+LC-0653,0.2898,Não sobrevive,média,Não sobreviveu
+LC-0037,0.5513,Sobrevive,baixa,Não sobreviveu
+LC-0330,0.0987,Não sobrevive,alta,Não sobreviveu
+LC-0285,0.2981,Não sobrevive,média,Não sobreviveu
+LC-0663,0.2445,Não sobrevive,média,Sobreviveu
+LC-1300,0.6265,Sobrevive,média,Não sobreviveu
+LC-0537,0.8451,Sobrevive,alta,Sobreviveu
+LC-0801,0.8296,Sobrevive,alta,Não sobreviveu
+LC-1801,0.8662,Sobrevive,alta,Sobreviveu
+LC-1030,0.5929,Sobrevive,média,Não sobreviveu
+LC-1033,0.2898,Não sobrevive,média,Não sobreviveu
+LC-0299,0.5718,Sobrevive,média,Sobreviveu
+LC-1548,0.5926,Sobrevive,média,Sobreviveu
+LC-0230,0.4462,Não sobrevive,baixa,Sobreviveu
+LC-0529,0.8008,Sobrevive,alta,Não sobreviveu
+LC-0824,0.2784,Não sobrevive,média,Não sobreviveu
+LC-1075,0.2653,Não sobrevive,média,Sobreviveu
+LC-0014,0.0822,Não sobrevive,alta,Não sobreviveu
+LC-0969,0.5679,Sobrevive,média,Não sobreviveu
+LC-0974,0.8552,Sobrevive,alta,Sobreviveu
+LC-1396,0.3574,Não sobrevive,média,Sobreviveu
+LC-0356,0.5587,Sobrevive,baixa,Não sobreviveu
+LC-1884,0.1041,Não sobrevive,alta,Não sobreviveu
+LC-1027,0.1281,Não sobrevive,alta,Não sobreviveu
+LC-0994,0.1169,Não sobrevive,alta,Não sobreviveu
+LC-1684,0.2687,Não sobrevive,média,Não sobreviveu
+LC-0428,0.3258,Não sobrevive,média,Não sobreviveu
+LC-1083,0.6337,Sobrevive,média,Sobreviveu
+LC-0727,0.833,Sobrevive,alta,Sobreviveu
+LC-0744,0.5243,Sobrevive,baixa,Sobreviveu
+LC-1058,0.7667,Sobrevive,alta,Sobreviveu
+LC-1834,0.6189,Sobrevive,média,Sobreviveu
+LC-0737,0.8169,Sobrevive,alta,Sobreviveu
+LC-0779,0.8299,Sobrevive,alta,Não sobreviveu
+LC-1912,0.5868,Sobrevive,média,Sobreviveu
+LC-1696,0.2696,Não sobrevive,média,Sobreviveu
+LC-1476,0.1118,Não sobrevive,alta,Não sobreviveu
+LC-0357,0.8207,Sobrevive,alta,Sobreviveu
+LC-0259,0.8378,Sobrevive,alta,Sobreviveu
+LC-1958,0.0768,Não sobrevive,alta,Não sobreviveu
+LC-0898,0.8581,Sobrevive,alta,Sobreviveu
+LC-0135,0.8557,Sobrevive,alta,Sobreviveu
+LC-0503,0.5219,Sobrevive,baixa,Sobreviveu
+LC-1005,0.8068,Sobrevive,alta,Sobreviveu
+LC-1943,0.1055,Não sobrevive,alta,Não sobreviveu
+LC-1731,0.5942,Sobrevive,média,Não sobreviveu
+LC-1227,0.105,Não sobrevive,alta,Não sobreviveu
+LC-0374,0.1179,Não sobrevive,alta,Não sobreviveu
+LC-0763,0.8303,Sobrevive,alta,Sobreviveu
+LC-1847,0.564,Sobrevive,baixa,Não sobreviveu
+LC-0010,0.8087,Sobrevive,alta,Sobreviveu
+LC-0774,0.3403,Não sobrevive,média,Sobreviveu
+LC-0109,0.5595,Sobrevive,baixa,Não sobreviveu
+LC-0788,0.8405,Sobrevive,alta,Sobreviveu
+LC-1634,0.5298,Sobrevive,baixa,Não sobreviveu
+LC-1428,0.3029,Não sobrevive,média,Não sobreviveu
+LC-1835,0.0914,Não sobrevive,alta,Não sobreviveu
+LC-1060,0.2419,Não sobrevive,média,Não sobreviveu
+LC-0740,0.1039,Não sobrevive,alta,Não sobreviveu
+LC-1341,0.1189,Não sobrevive,alta,Não sobreviveu
+LC-1426,0.812,Sobrevive,alta,Sobreviveu
+LC-0248,0.8624,Sobrevive,alta,Sobreviveu
+LC-0572,0.1342,Não sobrevive,alta,Não sobreviveu
+LC-0427,0.1347,Não sobrevive,alta,Não sobreviveu
+LC-1453,0.8323,Sobrevive,alta,Sobreviveu
+LC-0800,0.0853,Não sobrevive,alta,Não sobreviveu
+LC-0984,0.8027,Sobrevive,alta,Sobreviveu
+LC-0954,0.8553,Sobrevive,alta,Sobreviveu
+LC-0092,0.342,Não sobrevive,média,Não sobreviveu
+LC-1880,0.1009,Não sobrevive,alta,Não sobreviveu
+LC-0164,0.6372,Sobrevive,média,Sobreviveu
+LC-1365,0.7839,Sobrevive,alta,Sobreviveu
+LC-1037,0.8318,Sobrevive,alta,Sobreviveu
+LC-1343,0.8633,Sobrevive,alta,Sobreviveu
+LC-0538,0.5095,Sobrevive,baixa,Sobreviveu
+LC-1520,0.0884,Não sobrevive,alta,Não sobreviveu
+LC-0036,0.3251,Não sobrevive,média,Não sobreviveu
+LC-1906,0.6094,Sobrevive,média,Sobreviveu
+LC-1810,0.8437,Sobrevive,alta,Não sobreviveu
+LC-1431,0.542,Sobrevive,baixa,Não sobreviveu
+LC-0003,0.8185,Sobrevive,alta,Não sobreviveu
+LC-1277,0.8254,Sobrevive,alta,Sobreviveu
+LC-1542,0.5484,Sobrevive,baixa,Sobreviveu
+LC-1021,0.3047,Não sobrevive,média,Não sobreviveu
+LC-1788,0.8268,Sobrevive,alta,Sobreviveu
+LC-0283,0.1014,Não sobrevive,alta,Não sobreviveu
+LC-1822,0.5523,Sobrevive,baixa,Não sobreviveu
+LC-0337,0.6065,Sobrevive,média,Não sobreviveu
+LC-1286,0.1041,Não sobrevive,alta,Não sobreviveu
+LC-1854,0.3238,Não sobrevive,média,Não sobreviveu
+LC-0920,0.3081,Não sobrevive,média,Não sobreviveu
+LC-1713,0.8453,Sobrevive,alta,Não sobreviveu
+LC-0683,0.839,Sobrevive,alta,Sobreviveu
